@@ -54,6 +54,10 @@ export function createBaseAppConfig({
         '/api': {
           target: apiTarget,
           changeOrigin: true,
+          // Dlouhé SSE streamy generování (minuty, tiché fáze) – výchozí
+          // proxy timeout (~2 min) by je samovolně abortoval.
+          timeout: 10 * 60 * 1000,
+          proxyTimeout: 10 * 60 * 1000,
         },
       },
     },

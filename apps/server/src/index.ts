@@ -43,5 +43,10 @@ console.log(`opendraw-bun server on http://${config.host}:${config.port} (DT ${c
 export default {
   port: config.port,
   hostname: config.host,
+  // Generování (echo/LoRA/DT + SSE stream) trvá minuty a mezi SSE chunky
+  // jsou dlouhé tiché fáze – výchozí Bun idleTimeout (~10 s) by spojení
+  // samovolně abortoval. 0 = vypnuto, keep-alive drží SSE heartbeat
+  // (`: ping` v generate.ts).
+  idleTimeout: 0,
   fetch: app.fetch,
 };

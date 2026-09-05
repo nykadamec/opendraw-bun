@@ -105,9 +105,30 @@ export function generateRoutes(grpc: GrpcPort, config: ServerConfig, gallery: Ga
     let grpcCancel: (() => void) | null = null;
     let clientDisconnected = false;
     let closed = false;
+    let heartbeat: ReturnType<typeof setInterval> | null = null;
+    const clearHeartbeat = (): void => {
+      if (heartbeat) {
+        clearInterval(heartbeat);
+        heartbeat = null;
+      }
+    };
 
     const stream = new ReadableStream<Uint8Array>({
       start(controller) {
+        // SSE heartbeat: `: ping` komentář každých 8 s po celou dobu streamu
+        // (vč. tiché fáze echo/LoRA/čekání na DT). Drží spojení proti
+        // Bun idleTimeout i Vite/proxy timeoutům – klient EventSource
+        // komentáře ignoruje, žádný UI event se negeneruje.
+        heartbeat = setInterval(() => {
+          if (closed || clientDisconnected) return;
+          try {
+            controller.enqueue(encoder.encode(`: ping\n\n`));
+          } catch {
+            // stream už zavřený – úklid proběhne ve finish()/cancel()
+          }
+        }, 8000);
+        // Interval nesmí držet proces při životě po skončení requestu.
+        (heartbeat as unknown as { unref?: () => void })?.unref?.();
         const sendSSE = (event: string, data: unknown): void => {
           if (closed || clientDisconnected) return;
           try {
@@ -119,6 +140,7 @@ export function generateRoutes(grpc: GrpcPort, config: ServerConfig, gallery: Ga
         const finish = (): void => {
           if (closed) return;
           closed = true;
+          clearHeartbeat();
           try {
             controller.close();
           } catch {
@@ -130,6 +152,7 @@ export function generateRoutes(grpc: GrpcPort, config: ServerConfig, gallery: Ga
           if (closed) return;
           log("client disconnected, cancelling gRPC stream");
           clientDisconnected = true;
+          clearHeartbeat();
           if (grpcCancel) grpcCancel();
         };
         c.req.raw.signal.addEventListener("abort", onAbort, { once: true });
@@ -377,6 +400,8 @@ export function generateRoutes(grpc: GrpcPort, config: ServerConfig, gallery: Ga
       },
       cancel() {
         if (closed) return;
+        closed = true;
+        clearHeartbeat();
         log("client disconnected (stream cancel), cancelling gRPC stream");
         clientDisconnected = true;
         if (grpcCancel) grpcCancel();
