@@ -9,6 +9,7 @@
 // import.meta.dir – žádné absolutní cesty. Ukončení (Ctrl+C) zabije
 // všechny tři procesy.
 
+import fs from "node:fs";
 import path from "node:path";
 
 function usage(): void {
@@ -52,6 +53,27 @@ const displayHost = host === "0.0.0.0" ? "localhost" : host;
 const apiTarget = `http://${displayHost}:${port}`;
 
 const children: import("node:child_process").ChildProcess[] = [];
+// PID soubory pro přesné zastavování (stop-all.sh). Jen /tmp je absolutní.
+const pidFiles: Record<string, string> = {
+  server: "/tmp/opendraw-bun-dev.server.pid",
+  desktop: "/tmp/opendraw-bun-dev.desktop.pid",
+  mobile: "/tmp/opendraw-bun-dev.mobile.pid",
+};
+
+function writePid(name: string, pid: number | undefined): void {
+  if (pid === undefined) return;
+  fs.writeFileSync(pidFiles[name], String(pid));
+}
+
+function cleanupPidFiles(): void {
+  for (const f of Object.values(pidFiles)) {
+    try {
+      fs.rmSync(f, { force: true });
+    } catch {
+      // ignoruj – soubor už neexistuje
+    }
+  }
+}
 // Bun global je k dispozici pod bun runtime; fallback na node:child_process.
 const { spawn } = await import("node:child_process");
 
@@ -63,6 +85,7 @@ function run(name: string, cmd: string, opts: { cwd: string; env: NodeJS.Process
     shell: true,
   });
   children.push(child);
+  writePid(name, child.pid);
   child.on("exit", (code, signal) => {
     console.log(`[dev] ${name} skončil (code=${code}, signal=${signal}) – zastavuji zbytek.`);
     shutdown();
@@ -81,6 +104,7 @@ function shutdown(): void {
       // ignoruj – proces už neběží
     }
   }
+  cleanupPidFiles();
 }
 
 process.on("SIGINT", () => {
