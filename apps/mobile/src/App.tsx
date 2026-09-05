@@ -31,7 +31,7 @@ function App() {
           <Routes>
             <Route path="/" element={<GeneratePage />} />
             <Route path="/gallery" element={<GalleryPage />} />
-            <Route path="/projects" element={<ProjectsPage />} />
+            <Route path="/projects" element={<ProjectsPage allowCanvasOpen={false} />} />
             <Route path="/loras" element={<LorasPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Routes>
