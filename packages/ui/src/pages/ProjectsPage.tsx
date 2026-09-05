@@ -134,6 +134,9 @@ export default function ProjectsPage({ allowCanvasOpen = true }: { allowCanvasOp
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ kind: 'ok' | 'error'; text: string; id: number } | null>(null);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [links, setLinks] = useState<Record<string, string>>(() => (typeof window === 'undefined' ? {} : loadLinks()));
   const [linkFilter, setLinkFilter] = useState<LinkFilter>('all');
   const [viewerData, setViewerData] = useState<EntryViewData | null>(null);
@@ -187,6 +190,7 @@ export default function ProjectsPage({ allowCanvasOpen = true }: { allowCanvasOp
 
   const loadAll = useCallback(async (refresh = false) => {
     if (refresh) setRefreshing(true);
+    else setLoading(true);
     try {
       const [dtList, canvasList] = await Promise.all([
         listProjects(refresh),
@@ -194,13 +198,32 @@ export default function ProjectsPage({ allowCanvasOpen = true }: { allowCanvasOp
       ]);
       setProjects(dtList);
       setCanvases(canvasList);
+      setLoadError(null);
+      if (refresh) setToast({ kind: 'ok', text: 'Aktualizováno', id: Date.now() });
     } catch (err) {
-      console.error('Failed to load projects', err);
+      const failed = 'Načtení se nezdařilo — zkuste to znovu';
+      setLoadError(failed);
+      if (refresh) setToast({ kind: 'error', text: failed, id: Date.now() });
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   }, []);
+
+  // Toast po obnovení sám zmizí
+  useEffect(() => {
+    if (!toast) return;
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(null), 2600);
+    return () => {
+      if (toastTimer.current) clearTimeout(toastTimer.current);
+    };
+  }, [toast]);
+
+  const handleRefresh = useCallback(() => {
+    if (refreshing) return;
+    void loadAll(true);
+  }, [loadAll, refreshing]);
 
   useEffect(() => {
     loadAll();
@@ -689,12 +712,16 @@ export default function ProjectsPage({ allowCanvasOpen = true }: { allowCanvasOp
             </div>
             <div className="flex items-center gap-2 flex-shrink-0 pb-0.5">
               <button data-el-name="ProjectRefreshButton"
-                onClick={() => loadAll(true)}
-                disabled={refreshing}
-                aria-label="Obnovit projekty"
+                onClick={handleRefresh}
+                disabled={refreshing || loading}
+                aria-label={refreshing ? 'Obnovuji projekty…' : 'Obnovit projekty'}
+                aria-busy={refreshing}
+                title={refreshing ? 'Obnovuji…' : 'Obnovit'}
                 className="w-10 h-10 rounded-full flex items-center justify-center text-txt-secondary hover:bg-surface-el active:bg-border transition-colors disabled:opacity-40"
               >
-                <ArrowRotate size={17} />
+                <span className={refreshing ? 'animate-spin inline-flex' : 'inline-flex'}>
+                  <ArrowRotate size={17} />
+                </span>
               </button>
               <button data-el-name="CanvasCreateButton"
                 onClick={() => { setCreateName(''); setCreateOpen(true); }}
@@ -768,6 +795,19 @@ export default function ProjectsPage({ allowCanvasOpen = true }: { allowCanvasOp
       </div>
 
       <div data-el-name="ProjectsListBody" className="px-4 py-4 max-w-[880px] mx-auto">
+        {!loading && loadError && (
+          <div data-el-name="ProjectsLoadError" role="alert" className="mb-3 flex items-center gap-3 bg-surface rounded-2xl px-4 py-3 border border-red-500/30">
+            <p className="flex-1 text-[13px] text-txt-secondary">{loadError}</p>
+            <button
+              data-el-name="ProjectsRetryButton"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="h-9 px-3.5 rounded-full bg-txt-primary text-canvas text-[13px] font-medium active:opacity-80 transition-opacity disabled:opacity-40 flex-shrink-0"
+            >
+              {refreshing ? 'Obnovuji…' : 'Zkusit znovu'}
+            </button>
+          </div>
+        )}
         {loading ? (
           <div data-el-name="ProjectSkeleton" className="space-y-2.5">
             {Array.from({ length: 5 }).map((_, i) => (
@@ -934,6 +974,30 @@ export default function ProjectsPage({ allowCanvasOpen = true }: { allowCanvasOp
               className="w-full h-12 rounded-2xl bg-txt-primary text-canvas text-[15px] font-medium active:opacity-80 transition-opacity">Rozumím</button>
           </div>
         </>
+      )}
+      {/* Toast: potvrzení po obnovení */}
+      {toast && (
+        <div
+          data-el-name="ProjectsToast"
+          role="status"
+          aria-live="polite"
+          key={toast.id}
+          className={`fixed z-50 left-1/2 -translate-x-1/2 px-4 h-11 rounded-full flex items-center gap-2 text-[13px] font-medium shadow-lg border transition-all ${
+            toast.kind === 'ok'
+              ? 'bg-txt-primary text-canvas border-transparent'
+              : 'bg-surface text-txt-primary border-red-500/30'
+          }`}
+          style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 1.25rem)' }}
+        >
+          <span
+            data-el-name="ProjectsToastDot"
+            aria-hidden
+            className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+              toast.kind === 'ok' ? 'bg-canvas' : 'bg-red-500'
+            }`}
+          />
+          {toast.text}
+        </div>
       )}
     </div>
   );
