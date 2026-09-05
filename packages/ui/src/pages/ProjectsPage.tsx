@@ -370,9 +370,12 @@ export default function ProjectsPage({ allowCanvasOpen = true }: { allowCanvasOp
     setQuery({ project: id, page: null, entry: null });
   };
 
-  const openCanvas = (id: string) => {
-    if (allowCanvasOpen) navigate(`/canvas/${id}`);
-    else setDesktopBadgeOpen(true);
+  const openCanvas = (_id: string) => {
+    // CanvasPage (/canvas/:id) odstraněna — žádné mrtvé navigace, vždy badge sheet v design stylu.
+    // allowCanvasOpen ponecháno pro API kompatibilitu (mobil předává false).
+    void allowCanvasOpen;
+    void _id;
+    setDesktopBadgeOpen(true);
   };
 
   const loadMore = () => {
@@ -387,7 +390,8 @@ export default function ProjectsPage({ allowCanvasOpen = true }: { allowCanvasOp
       setCanvases((prev) => [...prev, project]);
       setCreateOpen(false);
       setCreateName('');
-      if (allowCanvasOpen) navigate(`/canvas/${project.id}`);
+      // Bez navigace — /canvas/:id neexistuje (CanvasPage smazána).
+      void project;
     } catch (err) {
       console.error('Failed to create canvas project:', err);
     }
@@ -508,12 +512,11 @@ export default function ProjectsPage({ allowCanvasOpen = true }: { allowCanvasOp
               {linked ? (
                 <div className="flex gap-2 flex-shrink-0">
                   {allowCanvasOpen ? (
-                    <button data-el-name="ProjectCanvasOpenButton"
-                      onClick={() => navigate(`/canvas/${linked.id}`)}
-                      className="min-h-[44px] px-4 rounded-full bg-surface-el border border-border text-txt-primary text-[13px] font-medium flex items-center active:bg-border transition-colors"
+                    <span data-el-name="ProjectCanvasDesktopBadge"
+                      className="min-h-[44px] px-4 rounded-full bg-surface-el border border-border text-txt-secondary text-[13px] font-medium flex items-center"
                     >
-                      Otevřít canvas
-                    </button>
+                      Již brzy
+                    </span>
                   ) : (
                     <span data-el-name="ProjectCanvasDesktopBadge"
                       className="min-h-[44px] px-4 rounded-full bg-surface-el border border-border text-txt-secondary text-[13px] font-medium flex items-center"
@@ -909,7 +912,7 @@ export default function ProjectsPage({ allowCanvasOpen = true }: { allowCanvasOp
         </>
       )}
 
-      {/* Badge sheet: mobil bez canvasu */}
+      {/* Badge sheet: canvas dočasně nedostupný (desktop) / mobil bez canvasu */}
       {desktopBadgeOpen && (
         <>
           <div data-el-name="DesktopBadgeBackdrop" className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40" onClick={() => setDesktopBadgeOpen(false)} />
@@ -917,8 +920,8 @@ export default function ProjectsPage({ allowCanvasOpen = true }: { allowCanvasOp
             <div className="min-h-[24px] flex items-center justify-center" aria-hidden>
               <div className="w-10 h-1 bg-border rounded-full" />
             </div>
-            <h3 data-el-name="DesktopBadgeTitle" className="text-[17px] font-semibold text-txt-primary mt-1">Canvas je na desktopu</h3>
-            <p data-el-name="DesktopBadgeText" className="text-[14px] text-txt-secondary mt-1 mb-4">Otevřete si OpenDraw na počítači — mobilní aplikace canvas editor neobsahuje.</p>
+            <h3 data-el-name="DesktopBadgeTitle" className="text-[17px] font-semibold text-txt-primary mt-1">{allowCanvasOpen ? 'Canvas již brzy' : 'Canvas je na desktopu'}</h3>
+            <p data-el-name="DesktopBadgeText" className="text-[14px] text-txt-secondary mt-1 mb-4">{allowCanvasOpen ? 'Canvas editor je dočasně nedostupný — sledujte další aktualizace.' : 'Otevřete si OpenDraw na počítači — mobilní aplikace canvas editor neobsahuje.'}</p>
             <button data-el-name="DesktopBadgeClose" onClick={() => setDesktopBadgeOpen(false)}
               className="w-full min-h-[48px] rounded-2xl bg-txt-primary text-canvas text-[15px] font-medium active:opacity-80 transition-opacity">Rozumím</button>
           </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, NavLink, useLocation } from 'react-router-dom';
-import { Sparkles, Gallery, Folder, Settings, Layout } from 'reicon-react';
+import { Sparkles, Gallery, Folder, Settings } from 'reicon-react';
 import PuzzlePiece from 'reicon-react/icons/PuzzlePiece';
 import { fetchEcho } from '@opendraw/api-client';
 import {
@@ -8,7 +8,6 @@ import {
   GalleryPage,
   ProjectsPage,
   LorasPage,
-  CanvasPage,
   CanvasProjectsPage,
   SettingsPage,
   useFeatureFlag,
@@ -123,7 +122,6 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { path: '/', label: 'Generovat', icon: Sparkles },
-  { path: '/canvas', label: 'Canvas', icon: Layout, disabled: true, tooltip: 'Již brzy' },
   { path: '/gallery', label: 'Galerie', icon: Gallery },
   { path: '/projects', label: 'Projekty', icon: Folder },
   { path: '/loras', label: 'LoRA', icon: PuzzlePiece },
@@ -133,7 +131,10 @@ const NAV_ITEMS: NavItem[] = [
 function App() {
   const location = useLocation();
   const isGeneratePage = location.pathname === '/';
+  // /canvas/:id odstraněno (CanvasPage smazána) — ponecháno pro budoucnost.
+  // canvasgen2 layout větve níže záměrně zůstávají, podmínka je jen isGeneratePage.
   const isCanvasPage = location.pathname.startsWith('/canvas');
+  void isCanvasPage;
   const [canvasgen2] = useFeatureFlag('canvasgen2', false);
 
   const [sidebarVisible, setSidebarVisible] = useState(() => {
@@ -156,7 +157,7 @@ function App() {
           <aside data-el-name="DesktopSidebar"
             className={`fixed left-4 top-4 z-30 h-[calc(100vh-32px)] w-60 overflow-y-auto scrollbar-none
               rounded-2xl transition-all duration-300 ease-in-out
-              ${isGeneratePage || isCanvasPage
+              ${isGeneratePage
                 ? 'bg-canvas/30 backdrop-blur-2xl shadow-2xl'
                 : 'bg-surface border border-border shadow-xl panel-surface'
               }
@@ -185,7 +186,6 @@ function App() {
             <Route path="/" element={<GeneratePage />} />
             <Route path="/gallery" element={<GalleryPage />} />
             <Route path="/canvas" element={<CanvasProjectsPage />} />
-            <Route path="/canvas/:id" element={<CanvasPage />} />
             <Route path="/projects" element={<ProjectsPage />} />
             <Route path="/loras" element={<LorasPage />} />
             <Route path="/settings" element={<SettingsPage />} />
@@ -197,7 +197,7 @@ function App() {
             onClick={() => setSidebarVisible(false)}
             className={`fixed top-1/2 z-30 w-8 h-16 rounded-r-lg
               flex items-center justify-center text-txt-secondary hover:text-txt-primary active:bg-border transition-colors
-              ${isGeneratePage || isCanvasPage
+              ${isGeneratePage
                 ? 'bg-canvas/30 backdrop-blur-xl shadow-lg'
                 : 'bg-surface border border-border shadow-lg'
               }`}
@@ -210,7 +210,7 @@ function App() {
             onClick={() => setSidebarVisible(true)}
             className={`fixed left-4 top-1/2 -translate-y-1/2 z-30 w-8 h-16 rounded-r-lg
               flex items-center justify-center text-txt-secondary hover:text-txt-primary active:bg-border transition-colors
-              ${isGeneratePage || isCanvasPage
+              ${isGeneratePage
                 ? 'bg-canvas/30 backdrop-blur-xl shadow-lg'
                 : 'bg-surface border border-border shadow-lg'
               }`}

@@ -12,7 +12,6 @@ export { default as GalleryPage } from './pages/GalleryPage';
 export { default as ProjectsPage } from './pages/ProjectsPage';
 export { default as LorasPage } from './pages/LorasPage';
 export { default as SettingsPage } from './pages/SettingsPage';
-export { default as CanvasPage } from './pages/CanvasPage';
 export { default as CanvasProjectsPage } from './pages/CanvasProjectsPage';
 
 export { useFeatureFlag } from './hooks/useFeatureFlag';
