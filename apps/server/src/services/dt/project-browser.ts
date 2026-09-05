@@ -13,6 +13,8 @@
 // Zachováno 1:1:
 //  - sanitizeProjectId (path traversal guard)
 //  - thumbnail JPEG carving (FFD8..FFD9) z thumbnailhistorynode
+//    joinem tensorhistorynode.rowid → tensorhistorynode__f86.f86
+//    → thumbnailhistorynode.__pk0 (legacy rowid=rowid jen fallback)
 //  - config (flatbuffers TensorHistoryNode) z tensorhistorynode
 //  - routy beze změny (`refresh` parametr se ignoruje – nechán pro kontrakt)
 
@@ -455,26 +457,71 @@ export class ProjectBrowser {
       const sourcePath = this.sourcePath(safeId);
       return this.withBusyRetry(safeId, "getProjectEntryThumbnail", () => {
         const db = this.db.open(sourcePath, true);
-        let row: ThumbRow | null;
         try {
-          row = db.get<ThumbRow>(
-            "SELECT p FROM thumbnailhistorynode WHERE rowid = ?",
-            parseInt(entryId),
-          );
+          const entryRowid = parseInt(entryId);
+          const carveJpeg = (p: Uint8Array | Buffer | null | undefined): Buffer | null => {
+            const buf = toBuffer(p);
+            if (!buf) return null;
+            const jpegStart = buf.indexOf(Buffer.from([0xff, 0xd8, 0xff]));
+            const jpegEnd = buf.indexOf(Buffer.from([0xff, 0xd9]));
+            if (jpegStart >= 0 && jpegEnd > jpegStart) {
+              return buf.subarray(jpegStart, jpegEnd + 2);
+            }
+            return null;
+          };
+          // Primární join: tensorhistorynode.rowid → tensorhistorynode__f86.f86
+          // → thumbnailhistorynode.__pk0 (rowid ≠ rowid – posun o ~6 + 404 na ocasu).
+          try {
+            const fk = db.get<{ f86: number | null }>(
+              "SELECT f86 FROM tensorhistorynode__f86 WHERE rowid = ?",
+              entryRowid,
+            );
+            if (fk && fk.f86 != null) {
+              try {
+                const thumb = db.get<ThumbRow>(
+                  "SELECT p FROM thumbnailhistorynode WHERE __pk0 = ?",
+                  fk.f86,
+                );
+                const carved = carveJpeg(thumb?.p);
+                if (carved) return carved;
+              } catch (err) {
+                if (isBusyError(err)) throw err;
+                // jinak pokračuj na další fallback
+              }
+              // Druhý fallback: menší half-thumb stejným joinem.
+              try {
+                const half = db.get<ThumbRow>(
+                  "SELECT p FROM thumbnailhistoryhalfnode WHERE __pk0 = ?",
+                  fk.f86,
+                );
+                const carvedHalf = carveJpeg(half?.p);
+                if (carvedHalf) return carvedHalf;
+              } catch (err) {
+                if (isBusyError(err)) throw err;
+                // jinak pokračuj na legacy fallback
+              }
+            }
+          } catch (err) {
+            if (isBusyError(err)) throw err;
+            // chybějící __f86 tabulka / jiný non-busy problém → legacy fallback níže
+          }
+          // Legacy fallback: starý rowid=rowid join (jen pro staré DB bez __f86).
+          try {
+            const row = db.get<ThumbRow>(
+              "SELECT p FROM thumbnailhistorynode WHERE rowid = ?",
+              entryRowid,
+            );
+            if (!row) return null;
+            return carveJpeg(row.p);
+          } catch (err) {
+            if (isBusyError(err)) throw err;
+            return null;
+          }
         } finally {
           try {
             db.close();
           } catch {}
         }
-        if (!row) return null;
-        const buf = toBuffer(row.p);
-        if (!buf) return null;
-        const jpegStart = buf.indexOf(Buffer.from([0xff, 0xd8, 0xff]));
-        const jpegEnd = buf.indexOf(Buffer.from([0xff, 0xd9]));
-        if (jpegStart >= 0 && jpegEnd > jpegStart) {
-          return buf.subarray(jpegStart, jpegEnd + 2);
-        }
-        return null;
       });
     } catch (err) {
       console.error(
