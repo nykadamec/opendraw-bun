@@ -549,6 +549,7 @@ export default function GeneratePage() {
 
   const initialized = useRef(false);
   const cancelRef = useRef<(() => void) | null>(null);
+  const stopIntentRef = useRef(false);
 
 
 
@@ -982,6 +983,7 @@ if (raw.sampler !== undefined) {
     setResultImage(null);
     setPreviewImage(null);
     setGenerating(true);
+    stopIntentRef.current = false;
 
     cancelRef.current = generateImage(
       {
@@ -1039,11 +1041,22 @@ if (raw.sampler !== undefined) {
           setProgress(null);
           cancelRef.current = null;
         },
+        onAbort: () => {
+          cancelRef.current = null;
+          setGenerating(false);
+          setProgress(null);
+          if (stopIntentRef.current) {
+            stopIntentRef.current = false;
+            return;
+          }
+          setGenerateError('Spojení při generování spadlo. Zkus to prosím znovu.');
+        },
       }
     );
   };
   const handleStop = () => {
     if (cancelRef.current) {
+      stopIntentRef.current = true;
       cancelRef.current();
       cancelRef.current = null;
     }
@@ -1265,6 +1278,7 @@ if (raw.sampler !== undefined) {
         {generateError && (
           <div data-el-name="GenerateErrorBanner" className="mx-3 p-3 rounded-2xl bg-red-500/10 border border-red-500/30 text-[13px] text-red-500 flex items-start gap-2">
             <span className="flex-1">{generateError}</span>
+            <button onClick={() => { setGenerateError(null); handleGenerate(); }} className="min-w-[44px] min-h-[44px] -m-2 px-2 font-semibold whitespace-nowrap hover:text-red-400 transition-colors">Zkusit znovu</button>
             <button onClick={() => setGenerateError(null)} className="min-w-[44px] min-h-[44px] -m-2 underline whitespace-nowrap hover:text-red-400 transition-colors">Zavřít</button>
           </div>
         )}
@@ -1303,6 +1317,13 @@ if (raw.sampler !== undefined) {
             <div data-el-name="StorageLimitBanner" className="mb-3 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-xs text-red-500 flex items-start gap-2">
               <span className="flex-1">{storageLimitError}</span>
               <button onClick={() => setStorageLimitError(null)} className="underline whitespace-nowrap hover:text-red-400 transition-colors">Zavřít</button>
+            </div>
+          )}
+          {generateError && (
+            <div data-el-name="GenerateErrorBanner" className="mb-3 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-xs text-red-500 flex items-start gap-2">
+              <span className="flex-1">{generateError}</span>
+              <button onClick={() => { setGenerateError(null); handleGenerate(); }} className="font-semibold whitespace-nowrap hover:text-red-400 transition-colors">Zkusit znovu</button>
+              <button onClick={() => setGenerateError(null)} className="underline whitespace-nowrap hover:text-red-400 transition-colors">Zavřít</button>
             </div>
           )}
           <CanvasArea image={resultImage} preview={previewImage} loading={generating} progress={progress} />

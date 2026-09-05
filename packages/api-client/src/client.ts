@@ -44,6 +44,7 @@ export function generateImage(
     onComplete?: (data: any) => void;
     onError?: (err: string) => void;
     onPreview?: (imageBase64: string) => void;
+    onAbort?: () => void;
   }
 ): () => void {
   const controller = new AbortController();
@@ -93,7 +94,9 @@ export function generateImage(
       }
     }
   }).catch((err) => {
-    if (err.name !== 'AbortError') {
+    if (err?.name === 'AbortError' || err?.code === 20) {
+      callbacks.onAbort?.();
+    } else {
       callbacks.onError?.(err.message);
     }
   });
