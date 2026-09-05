@@ -1,0 +1,123 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+/* Monorepo: Tailwind v4 skenuje automaticky jen app root (apps/desktop,
+   resp. apps/mobile). Utility v packages/ui by jinak nikdy nevznikly
+   a stránka by byla holé HTML bez layoutu. */
+@source "../../ui/src";
+@source "../../../apps/desktop/src";
+@source "../../../apps/mobile/src";
+
+/* Design tokeny jako Tailwind utility (bg-canvas, text-txt-primary, …).
+   `inline` zajistí, že utility čtou CSS proměnné za běhu,
+   takže přepínání [data-theme] funguje bez rebuildu. */
+@theme inline {
+  --color-canvas: var(--color-canvas);
+  --color-surface: var(--color-surface);
+  --color-surface-el: var(--color-surface-el);
+  --color-surface-glass: var(--color-surface-glass);
+  --color-border: var(--color-border);
+  --color-border-hover: var(--color-border-hover);
+  --color-txt-primary: var(--color-txt-primary);
+  --color-txt-secondary: var(--color-txt-secondary);
+  --color-txt-tertiary: var(--color-txt-tertiary);
+  --color-err: var(--color-err);
+  --color-primary: var(--color-primary);
+  --color-checker: var(--color-checker);
+  --font-sans: "Inter", system-ui, sans-serif;
+  --radius-card: 24px;
+}
+
+:root {
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  background-color: var(--color-canvas);
+  color: var(--color-txt-primary);
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-border-hover);
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.panel-surface {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .panel-surface {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* Skleněné plovoucí plochy (top bar, composer, overlaye) */
+.glass-panel {
+  background-color: var(--color-surface-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border);
+}
+
+/* Fade-in pro hotové obrázky po generování (placeholder → hotový snímek) */
+@keyframes canvas-fade-in {
+  from {
+    opacity: 0;
+    transform: scale(1.015);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-canvas-fade-in {
+  animation: canvas-fade-in 0.45s ease both;
+}
+
+/* Mobilní safe-area koncept (úroveň A): tab bar nese safe-area,
+   scroll obsah má rezervu tabBar (64px) + 16px mezera. */
+.mobile-tabbar {
+  min-height: calc(64px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.mobile-main-reserve {
+  padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Min. 16px vstupy jen v mobilní aplikaci – brání auto-zoomu na iOS. */
+.mobile-app input,
+.mobile-app textarea,
+.mobile-app select {
+  font-size: 16px;
+}
+
+.mobile-app input::placeholder,
+.mobile-app textarea::placeholder {
+  font-size: 14px;
+}

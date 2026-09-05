@@ -1,0 +1,22 @@
+{
+  "name": "@opendraw/config-theme",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/ThemeContext.tsx",
+    "./tokens.css": "./src/tokens.css",
+    "./index.css": "./src/index.css",
+    "./vite-base": "./src/vite-base.ts"
+  },
+  "dependencies": {
+    "react": "^19.2.8",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/react": "^19.2.18",
+    "@vitejs/plugin-react": "^6.1.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.2"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "opendraw-bun",
+  "private": true,
+  "type": "module",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev": "bun scripts/dev.ts",
+    "dev:server": "bun --filter @opendraw/server dev",
+    "dev:desktop": "bun --filter @opendraw/desktop dev",
+    "dev:mobile": "bun --filter @opendraw/mobile dev",
+    "build": "bun scripts/build.ts",
+    "build:ui": "bun scripts/build-ui.ts",
+    "build:backend": "bun scripts/build-backend.ts",
+    "build:web": "bun scripts/build-web.ts",
+    "install:all": "bun install"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.4.1",
+    "typescript": "^7.0.2"
+  }
+}

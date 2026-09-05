@@ -1,0 +1,28 @@
+{
+  "name": "@opendraw/desktop",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --force --host 0.0.0.0",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@opendraw/api-client": "workspace:*",
+    "@opendraw/config-theme": "workspace:*",
+    "@opendraw/ui": "workspace:*",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.18.3",
+    "reicon-react": "^1.1.2"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.2"
+  }
+}

@@ -1,0 +1,1032 @@
+[
+  {
+    "name": "LTX-2.3 22B [distilled] (Exact)",
+    "version": "ltx2.3",
+    "file": "ltx_2.3_22b_distilled_f16.ckpt"
+  },
+  {
+    "name": "LTX-2.3 22B [dev] (Exact)",
+    "version": "ltx2.3",
+    "file": "ltx_2.3_22b_dev_f16.ckpt"
+  },
+  {
+    "name": "Qwen Image 2512 (BF16, Exact)",
+    "version": "qwen_image",
+    "file": "qwen_image_2512_bf16.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_9b_q8p.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B (6-bit)",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_9b_q6p.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B KV",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_9b_kv_q8p.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B KV (6-bit)",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_9b_kv_q6p.ckpt"
+  },
+  {
+    "name": "FLUX.2 [dev]",
+    "version": "flux2",
+    "file": "flux_2_dev_q8p.ckpt"
+  },
+  {
+    "name": "FLUX.2 [dev] (6-bit)",
+    "version": "flux2",
+    "file": "flux_2_dev_q6p.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B Base",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_base_9b_q8p.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B Base (6-bit)",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_base_9b_q6p.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 4B (Exact)",
+    "version": "flux2_4b",
+    "file": "flux_2_klein_4b_f16.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 4B Base (Exact)",
+    "version": "flux2_4b",
+    "file": "flux_2_klein_base_4b_f16.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B (Exact)",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_9b_f16.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B KV (Exact)",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_9b_kv_f16.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B Base (Exact)",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_base_9b_f16.ckpt"
+  },
+  {
+    "name": "FLUX.2 [dev] (Exact)",
+    "version": "flux2",
+    "file": "flux_2_dev_f16.ckpt"
+  },
+  {
+    "name": "Z Image Turbo 1.0 (Exact)",
+    "version": "z_image",
+    "file": "z_image_turbo_1.0_f16.ckpt"
+  },
+  {
+    "name": "Z Image Base 1.0 (Exact)",
+    "version": "z_image",
+    "file": "z_image_1.0_f16.ckpt"
+  },
+  {
+    "name": "Qwen Image 1.0 (BF16, Exact)",
+    "version": "qwen_image",
+    "file": "qwen_image_1.0_bf16.ckpt"
+  },
+  {
+    "name": "Qwen Image 1.0 (Exact)",
+    "version": "qwen_image",
+    "file": "qwen_image_1.0_f16.ckpt"
+  },
+  {
+    "name": "Qwen Image Edit 2509 (BF16, Exact)",
+    "version": "qwen_image",
+    "file": "qwen_image_edit_2509_bf16.ckpt"
+  },
+  {
+    "name": "Qwen Image Edit 2509 (Exact)",
+    "version": "qwen_image",
+    "file": "qwen_image_edit_2509_f16.ckpt"
+  },
+  {
+    "name": "FLUX.1 Kontext [dev]",
+    "version": "flux1",
+    "file": "flux_1_kontext_dev_q8p.ckpt"
+  },
+  {
+    "name": "FLUX.1 Kontext [dev] (5-bit)",
+    "version": "flux1",
+    "file": "flux_1_kontext_dev_q5p.ckpt"
+  },
+  {
+    "name": "FLUX.1 Kontext [dev] (Exact)",
+    "version": "flux1",
+    "file": "flux_1_kontext_dev_f16.ckpt"
+  },
+  {
+    "name": "FLUX.1 Krea [dev]",
+    "version": "flux1",
+    "file": "flux_1_krea_dev_q8p.ckpt"
+  },
+  {
+    "name": "FLUX.1 Krea [dev] (5-bit)",
+    "version": "flux1",
+    "file": "flux_1_krea_dev_q5p.ckpt"
+  },
+  {
+    "name": "Krea 2 Turbo",
+    "version": "krea_2",
+    "file": "krea_2_turbo_q8p.ckpt"
+  },
+  {
+    "name": "Krea 2 Turbo (6-bit)",
+    "version": "krea_2",
+    "file": "krea_2_turbo_q6p.ckpt"
+  },
+  {
+    "name": "Krea 2 Turbo (8-bit S)",
+    "version": "krea_2",
+    "file": "krea_2_turbo_i8x.ckpt"
+  },
+  {
+    "name": "Krea 2 Turbo (6-bit S)",
+    "version": "krea_2",
+    "file": "krea_2_turbo_i6x.ckpt"
+  },
+  {
+    "name": "Krea 2 Raw",
+    "version": "krea_2",
+    "file": "krea_2_raw_q8p.ckpt"
+  },
+  {
+    "name": "Krea 2 Raw (6-bit)",
+    "version": "krea_2",
+    "file": "krea_2_raw_q6p.ckpt"
+  },
+  {
+    "name": "Krea 2 Raw (8-bit S)",
+    "version": "krea_2",
+    "file": "krea_2_raw_i8x.ckpt"
+  },
+  {
+    "name": "FLUX.1 [dev]",
+    "version": "flux1",
+    "file": "flux_1_dev_q8p.ckpt"
+  },
+  {
+    "name": "FLUX.1 [dev] (5-bit)",
+    "version": "flux1",
+    "file": "flux_1_dev_q5p.ckpt"
+  },
+  {
+    "name": "FLUX.1 Fill [dev]",
+    "version": "flux1",
+    "file": "flux_1_fill_dev_q8p.ckpt"
+  },
+  {
+    "name": "FLUX.1 Fill [dev] (5-bit)",
+    "version": "flux1",
+    "file": "flux_1_fill_dev_q5p.ckpt"
+  },
+  {
+    "name": "Wan v2.2 High Noise Expert T2V A14B Lightning 250928",
+    "version": "wan_v2.1_14b",
+    "file": "wan_v2.2_a14b_hne_t2v_lightning_250928_q8p.ckpt"
+  },
+  {
+    "name": "Wan v2.2 High Noise Expert T2V A14B Lightning 250928 (6-bit, SVDQuant)",
+    "version": "wan_v2.1_14b",
+    "file": "wan_v2.2_a14b_hne_t2v_lightning_250928_q6p_svd.ckpt"
+  },
+  {
+    "name": "HiDream I1 [dev] (Exact)",
+    "version": "hidream_i1",
+    "file": "hidream_i1_dev_f16.ckpt"
+  },
+  {
+    "name": "HiDream I1 [full] (Exact)",
+    "version": "hidream_i1",
+    "file": "hidream_i1_full_f16.ckpt"
+  },
+  {
+    "name": "HiDream I1 [fast] (Exact)",
+    "version": "hidream_i1",
+    "file": "hidream_i1_fast_f16.ckpt"
+  },
+  {
+    "name": "HiDream E1-1 (Exact)",
+    "version": "hidream_i1",
+    "file": "hidream_e1_1_f16.ckpt"
+  },
+  {
+    "name": "FLUX.1 [dev] (Exact)",
+    "version": "flux1",
+    "file": "flux_1_dev_f16.ckpt"
+  },
+  {
+    "name": "SD3 Large Turbo 3.5",
+    "version": "sd3_large",
+    "file": "sd3_large_turbo_3.5_q8p.ckpt"
+  },
+  {
+    "name": "SD3 Large Turbo 3.5 (6-bit)",
+    "version": "sd3_large",
+    "file": "sd3_large_turbo_3.5_q6p.ckpt"
+  },
+  {
+    "name": "SD3 Large 3.5",
+    "version": "sd3_large",
+    "file": "sd3_large_3.5_q8p.ckpt"
+  },
+  {
+    "name": "SD3 Large 3.5 (6-bit)",
+    "version": "sd3_large",
+    "file": "sd3_large_3.5_q6p.ckpt"
+  },
+  {
+    "name": "SD3 Large 3.5 (Exact)",
+    "version": "sd3_large",
+    "file": "sd3_large_3.5_f16.ckpt"
+  },
+  {
+    "name": "SD3 Medium 3.5",
+    "version": "sd3",
+    "file": "sd3_medium_3.5_f16.ckpt"
+  },
+  {
+    "name": "SD3 Medium 3.5 (8-bit)",
+    "version": "sd3",
+    "file": "sd3_medium_3.5_q8p.ckpt"
+  },
+  {
+    "name": "Hunyuan Video T2V 720p",
+    "version": "hunyuan_video",
+    "file": "hunyuan_video_t2v_720p_q8p.ckpt"
+  },
+  {
+    "name": "Hunyuan Video T2V 720p (5-bit, SVDQuant)",
+    "version": "hunyuan_video",
+    "file": "hunyuan_video_t2v_720p_q5p_svd.ckpt"
+  },
+  {
+    "name": "Wan 2.1 14B T2V FusionX",
+    "version": "wan_v2.1_14b",
+    "file": "wan_2.1_14b_t2v_fusionx_q8p.ckpt"
+  },
+  {
+    "name": "Wan 2.1 14B T2V FusionX (6-bit, SVDQuant)",
+    "version": "wan_v2.1_14b",
+    "file": "wan_2.1_14b_t2v_fusionx_q6p_svd.ckpt"
+  },
+  {
+    "name": "Wan 2.1 14B I2V FusionX",
+    "version": "wan_v2.1_14b",
+    "file": "wan_2.1_14b_i2v_fusionx_q8p.ckpt"
+  },
+  {
+    "name": "Wan 2.1 14B I2V FusionX (6-bit, SVDQuant)",
+    "version": "wan_v2.1_14b",
+    "file": "wan_2.1_14b_i2v_fusionx_q6p_svd.ckpt"
+  },
+  {
+    "name": "Wan 2.1 14B v1.1 Fun InP",
+    "version": "wan_v2.1_14b",
+    "file": "wan_2.1_14b_v1.1_fun_inp_q8p.ckpt"
+  },
+  {
+    "name": "Wan 2.1 14B v1.1 Fun InP (6-bit, SVDQuant)",
+    "version": "wan_v2.1_14b",
+    "file": "wan_2.1_14b_v1.1_fun_inp_q6p_svd.ckpt"
+  },
+  {
+    "name": "Wan 2.1 1.3B v1.1 Fun InP",
+    "version": "wan_v2.1_1.3b",
+    "file": "wan_2.1_1.3b_v1.1_fun_inp_f16.ckpt"
+  },
+  {
+    "name": "Wan 2.1 1.3B v1.1 Fun InP (8-bit)",
+    "version": "wan_v2.1_1.3b",
+    "file": "wan_2.1_1.3b_v1.1_fun_inp_q8p.ckpt"
+  },
+  {
+    "name": "AniSora v3.2 I2V Wan 2.2 A14B High Noise Expert",
+    "version": "wan_v2.1_14b",
+    "file": "anisora_v3.2_i2v_wan_2.2_a14b_hne_q8p.ckpt"
+  },
+  {
+    "name": "AniSora v3.2 I2V Wan 2.2 A14B High Noise Expert (6-bit, SVDQuant)",
+    "version": "wan_v2.1_14b",
+    "file": "anisora_v3.2_i2v_wan_2.2_a14b_hne_q6p_svd.ckpt"
+  },
+  {
+    "name": "AniSora v3.2 I2V Wan 2.2 A14B Low Noise Expert",
+    "version": "wan_v2.1_14b",
+    "file": "anisora_v3.2_i2v_wan_2.2_a14b_lne_q8p.ckpt"
+  },
+  {
+    "name": "AniSora v3.2 I2V Wan 2.2 A14B Low Noise Expert (6-bit, SVDQuant)",
+    "version": "wan_v2.1_14b",
+    "file": "anisora_v3.2_i2v_wan_2.2_a14b_lne_q6p_svd.ckpt"
+  },
+  {
+    "name": "ChronoEdit 14B",
+    "version": "wan_v2.1_14b",
+    "file": "chronoedit_14b_q8p.ckpt"
+  },
+  {
+    "name": "ChronoEdit 14B (6-bit, SVDQuant)",
+    "version": "wan_v2.1_14b",
+    "file": "chronoedit_14b_q6p_svd.ckpt"
+  },
+  {
+    "name": "SkyReels v2 I2V 1.3B 540p",
+    "version": "wan_v2.1_1.3b",
+    "file": "skyreels_v2_i2v_1.3b_540p_f16.ckpt"
+  },
+  {
+    "name": "SkyReels v2 I2V 1.3B 540p (8-bit)",
+    "version": "wan_v2.1_1.3b",
+    "file": "skyreels_v2_i2v_1.3b_540p_q8p.ckpt"
+  },
+  {
+    "name": "SkyReels v2 I2V 14B 540p",
+    "version": "wan_v2.1_14b",
+    "file": "skyreels_v2_i2v_14b_540p_q8p.ckpt"
+  },
+  {
+    "name": "SkyReels v2 I2V 14B 540p (6-bit, SVDQuant)",
+    "version": "wan_v2.1_14b",
+    "file": "skyreels_v2_i2v_14b_540p_q6p_svd.ckpt"
+  },
+  {
+    "name": "SkyReels v2 I2V 14B 720p",
+    "version": "wan_v2.1_14b",
+    "file": "skyreels_v2_i2v_14b_720p_q8p.ckpt"
+  },
+  {
+    "name": "SkyReels v2 I2V 14B 720p (6-bit, SVDQuant)",
+    "version": "wan_v2.1_14b",
+    "file": "skyreels_v2_i2v_14b_720p_q6p_svd.ckpt"
+  },
+  {
+    "name": "SkyReels v2 T2V 14B 540p",
+    "version": "wan_v2.1_14b",
+    "file": "skyreels_v2_t2v_14b_540p_q8p.ckpt"
+  },
+  {
+    "name": "SkyReels v2 T2V 14B 540p (6-bit, SVDQuant)",
+    "version": "wan_v2.1_14b",
+    "file": "skyreels_v2_t2v_14b_540p_q6p_svd.ckpt"
+  },
+  {
+    "name": "SkyReels v2 T2V 14B 720p",
+    "version": "wan_v2.1_14b",
+    "file": "skyreels_v2_t2v_14b_720p_q8p.ckpt"
+  },
+  {
+    "name": "SkyReels v2 T2V 14B 720p (6-bit, SVDQuant)",
+    "version": "wan_v2.1_14b",
+    "file": "skyreels_v2_t2v_14b_720p_q6p_svd.ckpt"
+  },
+  {
+    "name": "Wan 2.1 14B Fun InP",
+    "version": "wan_v2.1_14b",
+    "file": "wan_2.1_14b_fun_inp_q8p.ckpt"
+  },
+  {
+    "name": "Wan 2.1 14B Fun InP (6-bit, SVDQuant)",
+    "version": "wan_v2.1_14b",
+    "file": "wan_2.1_14b_fun_inp_q6p_svd.ckpt"
+  },
+  {
+    "name": "Wan 2.1 1.3B Fun InP",
+    "version": "wan_v2.1_1.3b",
+    "file": "wan_2.1_1.3b_fun_inp_f16.ckpt"
+  },
+  {
+    "name": "Wan 2.1 1.3B Fun InP (8-bit)",
+    "version": "wan_v2.1_1.3b",
+    "file": "wan_2.1_1.3b_fun_inp_q8p.ckpt"
+  },
+  {
+    "name": "Chroma1 HD",
+    "version": "flux1",
+    "file": "chroma_1_hd_r0.1_q8p.ckpt"
+  },
+  {
+    "name": "Chroma1 HD (5-bit)",
+    "version": "flux1",
+    "file": "chroma_1_hd_r0.1_q5p.ckpt"
+  },
+  {
+    "name": "Chroma v48 Detail Calibrated",
+    "version": "flux1",
+    "file": "chroma_v48_detail_calibrated_q8p.ckpt"
+  },
+  {
+    "name": "Chroma v48 Detail Calibrated (5-bit)",
+    "version": "flux1",
+    "file": "chroma_v48_detail_calibrated_q5p.ckpt"
+  },
+  {
+    "name": "Chroma v47 Detail Calibrated",
+    "version": "flux1",
+    "file": "chroma_v47_detail_calibrated_q8p.ckpt"
+  },
+  {
+    "name": "Chroma v47 Detail Calibrated (5-bit)",
+    "version": "flux1",
+    "file": "chroma_v47_detail_calibrated_q5p.ckpt"
+  },
+  {
+    "name": "PixelWave FLUX.1 Schnell 04",
+    "version": "flux1",
+    "file": "pixelwave_flux_1_schnell_04_q8p.ckpt"
+  },
+  {
+    "name": "PixelWave FLUX.1 Schnell 04 (5-bit, SVDQuant)",
+    "version": "flux1",
+    "file": "pixelwave_flux_1_schnell_04_q5p_svd.ckpt"
+  },
+  {
+    "name": "Shuttle v3.1 Aesthetic",
+    "version": "flux1",
+    "file": "shuttle_v3.1_aesthetic_q8p.ckpt"
+  },
+  {
+    "name": "Shuttle v3.1 Aesthetic (5-bit, SVDQuant)",
+    "version": "flux1",
+    "file": "shuttle_v3.1_aesthetic_q5p_svd.ckpt"
+  },
+  {
+    "name": "Shuttle Jaguar",
+    "version": "flux1",
+    "file": "shuttle_jaguar_q8p.ckpt"
+  },
+  {
+    "name": "Shuttle Jaguar (5-bit, SVDQuant)",
+    "version": "flux1",
+    "file": "shuttle_jaguar_q5p_svd.ckpt"
+  },
+  {
+    "name": "devMODE v0.3 Turbo",
+    "version": "flux1",
+    "file": "devmode_v0.3_turbo_q8p.ckpt"
+  },
+  {
+    "name": "devMODE v0.3 Turbo (5-bit, SVDQuant)",
+    "version": "flux1",
+    "file": "devmode_v0.3_turbo_q5p_svd.ckpt"
+  },
+  {
+    "name": "schnellMODE v3.3",
+    "version": "flux1",
+    "file": "schnellmode_v3.3_q8p.ckpt"
+  },
+  {
+    "name": "schnellMODE v3.3 (5-bit, SVDQuant)",
+    "version": "flux1",
+    "file": "schnellmode_v3.3_q5p_svd.ckpt"
+  },
+  {
+    "name": "Artsy Vibe v1",
+    "version": "flux1",
+    "file": "artsy_vibe_v1_q8p.ckpt"
+  },
+  {
+    "name": "Artsy Vibe v1 (5-bit, SVDQuant)",
+    "version": "flux1",
+    "file": "artsy_vibe_v1_q5p_svd.ckpt"
+  },
+  {
+    "name": "RayFLUX v3.0",
+    "version": "flux1",
+    "file": "rayflux_v3.0_aio_q8p.ckpt"
+  },
+  {
+    "name": "RayFLUX v3.0 (5-bit)",
+    "version": "flux1",
+    "file": "rayflux_v3.0_aio_q5p.ckpt"
+  },
+  {
+    "name": "SkyReels v1 Hunyuan T2V 544p",
+    "version": "hunyuan_video",
+    "file": "skyreels_v1_hunyuan_t2v_q8p.ckpt"
+  },
+  {
+    "name": "SkyReels v1 Hunyuan T2V 544p (5-bit, SVDQuant)",
+    "version": "hunyuan_video",
+    "file": "skyreels_v1_hunyuan_t2v_q5p_svd.ckpt"
+  },
+  {
+    "name": "SkyReels v1 Hunyuan I2V 544p",
+    "version": "hunyuan_video",
+    "file": "skyreels_v1_hunyuan_i2v_q8p.ckpt"
+  },
+  {
+    "name": "SkyReels v1 Hunyuan I2V 544p (5-bit, SVDQuant)",
+    "version": "hunyuan_video",
+    "file": "skyreels_v1_hunyuan_i2v_q5p_svd.ckpt"
+  },
+  {
+    "name": "Kwai Kolors 1.0",
+    "version": "sdxl_base_v0.9",
+    "file": "kwai_kolors_1.0_f16.ckpt"
+  },
+  {
+    "name": "Kwai Kolors 1.0 (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "kwai_kolors_1.0_q6p_q8p.ckpt"
+  },
+  {
+    "name": "Kwai Kolors Inpainting 1.0",
+    "version": "sdxl_base_v0.9",
+    "file": "kwai_kolors_inpainting_1.0_f16.ckpt"
+  },
+  {
+    "name": "Kwai Kolors Inpainting 1.0 (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "kwai_kolors_inpainting_1.0_q6p_q8p.ckpt"
+  },
+  {
+    "name": "FLUX.1 Depth [dev]",
+    "version": "flux1",
+    "file": "flux_1_depth_dev_q8p.ckpt"
+  },
+  {
+    "name": "FLUX.1 Depth [dev] (5-bit)",
+    "version": "flux1",
+    "file": "flux_1_depth_dev_q5p.ckpt"
+  },
+  {
+    "name": "FLUX.1 Canny [dev]",
+    "version": "flux1",
+    "file": "flux_1_canny_dev_q8p.ckpt"
+  },
+  {
+    "name": "FLUX.1 Canny [dev] (5-bit)",
+    "version": "flux1",
+    "file": "flux_1_canny_dev_q5p.ckpt"
+  },
+  {
+    "name": "FLUX.1 [dev] De-distill",
+    "version": "flux1",
+    "file": "flux_1_dev_de_distill_q8p.ckpt"
+  },
+  {
+    "name": "FLUX.1 [dev] De-distill (5-bit)",
+    "version": "flux1",
+    "file": "flux_1_dev_de_distill_q5p.ckpt"
+  },
+  {
+    "name": "Stable Cascade (Würstchen v3.0)",
+    "version": "wurstchen_v3.0_stage_c",
+    "file": "wurstchen_3.0_stage_c_f32_f16.ckpt"
+  },
+  {
+    "name": "Stable Cascade (Würstchen v3.0) (8-bit)",
+    "version": "wurstchen_v3.0_stage_c",
+    "file": "wurstchen_3.0_stage_c_f32_q6p_q8p.ckpt"
+  },
+  {
+    "name": "SD3 Medium",
+    "version": "sd3",
+    "file": "sd3_medium_f16.ckpt"
+  },
+  {
+    "name": "SD3 Medium (8-bit)",
+    "version": "sd3",
+    "file": "sd3_medium_q8p.ckpt"
+  },
+  {
+    "name": "Stable Video Diffusion I2V XT v1.1",
+    "version": "svd_i2v",
+    "file": "svd_i2v_xt_1.1_f16.ckpt"
+  },
+  {
+    "name": "Stable Video Diffusion I2V XT v1.1 (8-bit)",
+    "version": "svd_i2v",
+    "file": "svd_i2v_xt_1.1_q6p_q8p.ckpt"
+  },
+  {
+    "name": "Playground v2.5",
+    "version": "sdxl_base_v0.9",
+    "file": "playground_v2.5_f16.ckpt"
+  },
+  {
+    "name": "Playground v2.5 (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "playground_v2.5_q6p_q8p.ckpt"
+  },
+  {
+    "name": "Playground v2",
+    "version": "sdxl_base_v0.9",
+    "file": "playground_v2_f16.ckpt"
+  },
+  {
+    "name": "Playground v2 (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "playground_v2_q6p_q8p.ckpt"
+  },
+  {
+    "name": "SDXL Turbo",
+    "version": "sdxl_base_v0.9",
+    "file": "sd_xl_turbo_f16.ckpt"
+  },
+  {
+    "name": "SDXL Turbo (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "sd_xl_turbo_q6p_q8p.ckpt"
+  },
+  {
+    "name": "Stable Video Diffusion I2V v1.0",
+    "version": "svd_i2v",
+    "file": "svd_i2v_1.0_f16.ckpt"
+  },
+  {
+    "name": "Stable Video Diffusion I2V v1.0 (8-bit)",
+    "version": "svd_i2v",
+    "file": "svd_i2v_1.0_q6p_q8p.ckpt"
+  },
+  {
+    "name": "SSD 1B (Segmind SDXL)",
+    "version": "ssd_1b",
+    "file": "ssd_1b_f16.ckpt"
+  },
+  {
+    "name": "SSD 1B (Segmind SDXL) (8-bit)",
+    "version": "ssd_1b",
+    "file": "ssd_1b_q6p_q8p.ckpt"
+  },
+  {
+    "name": "Juggernaut XL Ragnarok",
+    "version": "sdxl_base_v0.9",
+    "file": "juggernaut_xl_ragnarok_f16.ckpt"
+  },
+  {
+    "name": "Juggernaut XL Ragnarok (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "juggernaut_xl_ragnarok_q6p_q8p.ckpt"
+  },
+  {
+    "name": "Juggernaut XL v9",
+    "version": "sdxl_base_v0.9",
+    "file": "juggernaut_xl_v9_f16.ckpt"
+  },
+  {
+    "name": "Juggernaut XL v9 (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "juggernaut_xl_v9_q6p_q8p.ckpt"
+  },
+  {
+    "name": "Animagine XL v3.1",
+    "version": "sdxl_base_v0.9",
+    "file": "animagine_xl_v3.1_f16.ckpt"
+  },
+  {
+    "name": "Animagine XL v3.1 (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "animagine_xl_v3.1_q6p_q8p.ckpt"
+  },
+  {
+    "name": "DreamShaper XL v2.1 Turbo",
+    "version": "sdxl_base_v0.9",
+    "file": "dreamshaper_xl_v2.1_turbo_f16.ckpt"
+  },
+  {
+    "name": "DreamShaper XL v2.1 Turbo (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "dreamshaper_xl_v2.1_turbo_q6p_q8p.ckpt"
+  },
+  {
+    "name": "Juggernaut XL v9 Lightning",
+    "version": "sdxl_base_v0.9",
+    "file": "juggernaut_xl_v9_lightning_f16.ckpt"
+  },
+  {
+    "name": "Juggernaut XL v9 Lightning (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "juggernaut_xl_v9_lightning_q6p_q8p.ckpt"
+  },
+  {
+    "name": "PixelWave v9",
+    "version": "sdxl_base_v0.9",
+    "file": "pixelwave_v9_f16.ckpt"
+  },
+  {
+    "name": "PixelWave v9 (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "pixelwave_v9_q6p_q8p.ckpt"
+  },
+  {
+    "name": "PixelWave 10",
+    "version": "sdxl_base_v0.9",
+    "file": "pixelwave_10_f16.ckpt"
+  },
+  {
+    "name": "PixelWave 10 (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "pixelwave_10_q6p_q8p.ckpt"
+  },
+  {
+    "name": "RealVisXL v4.0",
+    "version": "sdxl_base_v0.9",
+    "file": "realvisxl_v4.0_f16.ckpt"
+  },
+  {
+    "name": "RealVisXL v4.0 (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "realvisxl_v4.0_q6p_q8p.ckpt"
+  },
+  {
+    "name": "Juggernaut XL X",
+    "version": "sdxl_base_v0.9",
+    "file": "juggernaut_xl_x_f16.ckpt"
+  },
+  {
+    "name": "Juggernaut XL X (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "juggernaut_xl_x_q6p_q8p.ckpt"
+  },
+  {
+    "name": "iCatcher Realistic",
+    "version": "sdxl_base_v0.9",
+    "file": "icatcher_realistic_f16.ckpt"
+  },
+  {
+    "name": "iCatcher Realistic (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "icatcher_realistic_q6p_q8p.ckpt"
+  },
+  {
+    "name": "iCatcher Cartoon",
+    "version": "sdxl_base_v0.9",
+    "file": "icatcher_cartoon_f16.ckpt"
+  },
+  {
+    "name": "iCatcher Cartoon (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "icatcher_cartoon_q6p_q8p.ckpt"
+  },
+  {
+    "name": "ColorfulXL v6.0",
+    "version": "sdxl_base_v0.9",
+    "file": "colorfulxl_v6.0_f16.ckpt"
+  },
+  {
+    "name": "ColorfulXL v6.0 (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "colorfulxl_v6.0_q6p_q8p.ckpt"
+  },
+  {
+    "name": "Proteus v0.3",
+    "version": "sdxl_base_v0.9",
+    "file": "proteus_v0.3_f16.ckpt"
+  },
+  {
+    "name": "Proteus v0.3 (8-bit)",
+    "version": "sdxl_base_v0.9",
+    "file": "proteus_v0.3_q6p_q8p.ckpt"
+  },
+  {
+    "name": "Outfitting Fusion Virtual Try-on (Upper-Body)",
+    "version": "v1",
+    "file": "ootd_vton_upper_body_1.0_f16.ckpt"
+  },
+  {
+    "name": "Outfitting Fusion Virtual Try-on (Full-Body)",
+    "version": "v1",
+    "file": "ootd_vton_full_body_1.0_f16.ckpt"
+  },
+  {
+    "name": "AnimateLCM SVD XT v1.1",
+    "version": "svd_i2v",
+    "file": "animatelcm_svd_xt_v1.1_f16.ckpt"
+  },
+  {
+    "name": "AnimateLCM SVD XT v1.1 (8-bit)",
+    "version": "svd_i2v",
+    "file": "animatelcm_svd_xt_v1.1_q6p_q8p.ckpt"
+  },
+  {
+    "name": "Juggernaut Reborn",
+    "version": "v1",
+    "file": "juggernaut_reborn_f16.ckpt"
+  },
+  {
+    "name": "Juggernaut Reborn (8-bit)",
+    "version": "v1",
+    "file": "juggernaut_reborn_q6p_q8p.ckpt"
+  },
+  {
+    "name": "Disney Pixar Cartoon Type B (8-bit)",
+    "version": "v1",
+    "file": "disney_pixar_cartoon_type_b_q6p_q8p.ckpt"
+  },
+  {
+    "name": "Realistic Vision v5.1",
+    "version": "v1",
+    "file": "realistic_vision_v5.1_f16.ckpt"
+  },
+  {
+    "name": "Realistic Vision v5.1 (8-bit)",
+    "version": "v1",
+    "file": "realistic_vision_v5.1_q6p_q8p.ckpt"
+  },
+  {
+    "name": "DreamShaper v8",
+    "version": "v1",
+    "file": "dreamshaper_v8_f16.ckpt"
+  },
+  {
+    "name": "DreamShaper v8 (8-bit)",
+    "version": "v1",
+    "file": "dreamshaper_v8_q6p_q8p.ckpt"
+  },
+  {
+    "name": "Counterfeit v3.0",
+    "version": "v1",
+    "file": "counterfeit_v3.0_f16.ckpt"
+  },
+  {
+    "name": "Counterfeit v3.0 (8-bit)",
+    "version": "v1",
+    "file": "counterfeit_v3.0_q6p_q8p.ckpt"
+  },
+  {
+    "name": "MajicMIX Realistic v7",
+    "version": "v1",
+    "file": "majicmix_realistic_v7_f16.ckpt"
+  },
+  {
+    "name": "MajicMIX Realistic v7 (8-bit)",
+    "version": "v1",
+    "file": "majicmix_realistic_v7_q6p_q8p.ckpt"
+  },
+  {
+    "name": "Rev Animated v1.22",
+    "version": "v1",
+    "file": "rev_animated_v1.22_f16.ckpt"
+  },
+  {
+    "name": "Rev Animated v1.22 (8-bit)",
+    "version": "v1",
+    "file": "rev_animated_v1.22_q6p_q8p.ckpt"
+  },
+  {
+    "name": "Anime (Waifu Diffusion v1.3)",
+    "version": "v1",
+    "file": "wd_v1.3_f16.ckpt"
+  },
+  {
+    "name": "Multi-Style (Nitro Diffusion v1)",
+    "version": "v1",
+    "file": "nitro_v1_f16.ckpt"
+  },
+  {
+    "name": "Cyberpunk Anime",
+    "version": "v1",
+    "file": "cyberpunk_anime_f16.ckpt"
+  },
+  {
+    "name": "3D Model (Redshift v1)",
+    "version": "v1",
+    "file": "redshift_v1_f16.ckpt"
+  },
+  {
+    "name": "3D Model 768 (Redshift 768)",
+    "version": "v2",
+    "file": "redshift_768_v_f16.ckpt"
+  },
+  {
+    "name": "Dungeons and Diffusion (30000)",
+    "version": "v1",
+    "file": "dnd_30000_f16.ckpt"
+  },
+  {
+    "name": "Tron Legacy",
+    "version": "v1",
+    "file": "trnlgcy_f16.ckpt"
+  },
+  {
+    "name": "Openjourney",
+    "version": "v1",
+    "file": "mdjrny_v4_f16.ckpt"
+  },
+  {
+    "name": "Anime (Anything v3)",
+    "version": "v1",
+    "file": "anything_v3_f16.ckpt"
+  },
+  {
+    "name": "Classic Animation (v1)",
+    "version": "v1",
+    "file": "classicanim_v1_f16.ckpt"
+  },
+  {
+    "name": "Modern Disney (v1)",
+    "version": "v1",
+    "file": "modi_v1_f16.ckpt"
+  },
+  {
+    "name": "Arcane (v3)",
+    "version": "v1",
+    "file": "arcane_v3_f16.ckpt"
+  },
+  {
+    "name": "Hassanblend (v1.5.1.2)",
+    "version": "v1",
+    "file": "hassanblend_v1.5.1.2_f16.ckpt"
+  },
+  {
+    "name": "Van Gogh Style (Lvngvncnt v2)",
+    "version": "v1",
+    "file": "lvngvncnt_v2_f16.ckpt"
+  },
+  {
+    "name": "Spider-Verse (v1)",
+    "version": "v1",
+    "file": "spiderverse_v1_f16.ckpt"
+  },
+  {
+    "name": "Elden Ring (v3)",
+    "version": "v1",
+    "file": "eldenring_v3_f16.ckpt"
+  },
+  {
+    "name": "Paper Cut (v1)",
+    "version": "v1",
+    "file": "papercut_v1_f16.ckpt"
+  },
+  {
+    "name": "VoxelArt (v1)",
+    "version": "v1",
+    "file": "voxelart_v1_f16.ckpt"
+  },
+  {
+    "name": "Balloon Art (v1)",
+    "version": "v1",
+    "file": "balloonart_v1_f16.ckpt"
+  },
+  {
+    "name": "F222",
+    "version": "v1",
+    "file": "f222_f16.ckpt"
+  },
+  {
+    "name": "Super Mario Nation (v2)",
+    "version": "v1",
+    "file": "supermarionation_v2_f16.ckpt"
+  },
+  {
+    "name": "Inkpunk (v2)",
+    "version": "v1",
+    "file": "inkpunk_v2_f16.ckpt"
+  },
+  {
+    "name": "SamDoesArt (v3)",
+    "version": "v1",
+    "file": "samdoesart_v3_f16.ckpt"
+  },
+  {
+    "name": "Ghibli (v1)",
+    "version": "v1",
+    "file": "ghibli_v1_f16.ckpt"
+  },
+  {
+    "name": "Analog (v1)",
+    "version": "v1",
+    "file": "analog_v1_f16.ckpt"
+  },
+  {
+    "name": "DnD Classes and Species",
+    "version": "v1",
+    "file": "dnd_classes_and_species_f16.ckpt"
+  },
+  {
+    "name": "AloeVera's SimpMaker 3K1",
+    "version": "v1",
+    "file": "aloeveras_simpmaker_3k1_f16.ckpt"
+  },
+  {
+    "name": "H&A's 3DKX 1.1",
+    "version": "v1",
+    "file": "hna_3dkx_1.1_f16.ckpt"
+  },
+  {
+    "name": "seek.art MEGA (v1)",
+    "version": "v1",
+    "file": "seek_art_mega_v1_f16.ckpt"
+  },
+  {
+    "name": "Deliberate v2.0 (8-bit)",
+    "version": "v1",
+    "file": "deliberate_v2_q6p_q8p.ckpt"
+  }
+]

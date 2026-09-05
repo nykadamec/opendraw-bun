@@ -1,0 +1,15 @@
+{
+  "name": "@opendraw/protocol",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./*": "./dist/*"
+  },
+  "dependencies": {
+    "flatbuffers": "^25.9.23"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.1",
+    "typescript": "^7.0.2"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": ".",
+    "types": ["bun", "node"]
+  },
+  "include": ["src", "proto/fbs/ts"]
+}

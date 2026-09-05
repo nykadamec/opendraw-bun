@@ -1,0 +1,5 @@
+[install]
+# Bun workspaces monorepo – jeden lockfile v rootu
+auto = "fallback"
+
+[install.scopes]

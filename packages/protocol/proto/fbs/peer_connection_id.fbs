@@ -1,0 +1,6 @@
+table PeerConnectionId {
+  id: string;
+  updated_at: string;
+}
+
+root_type PeerConnectionId;

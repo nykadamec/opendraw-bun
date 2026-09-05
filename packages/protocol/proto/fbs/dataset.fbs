@@ -1,0 +1,6 @@
+table TrainingData {
+  id: string;
+  caption: string;
+}
+
+root_type TrainingData;
