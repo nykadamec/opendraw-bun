@@ -11,6 +11,8 @@
   --color-err: #ff4444;
   --color-primary: #555555;
   --color-checker: #181818;
+  --sidebar-bg: rgba(0, 0, 0, 0.3);
+  --sidebar-shadow: 0 25px 38px rgba(0, 0, 0, 0.25);
 }
 
 [data-theme="light"] {
@@ -26,4 +28,6 @@
   --color-err: #d32f2f;
   --color-primary: #9e9e9e;
   --color-checker: #ececec;
+  --sidebar-bg: rgba(255, 255, 255, 0.82);
+  --sidebar-shadow: 0 25px 38px rgba(0, 0, 0, 0.1);
 }

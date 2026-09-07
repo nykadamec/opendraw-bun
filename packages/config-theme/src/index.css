@@ -25,6 +25,7 @@
   --color-primary: var(--color-primary);
   --color-checker: var(--color-checker);
   --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Jost", "Inter", system-ui, sans-serif;
   --radius-card: 24px;
 }
 
@@ -81,6 +82,18 @@ body,
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--color-border);
+}
+
+/* Desktop sidebar podle návrhu AppWeb: plovoucí overlay 240px,
+   16px od kraje, radius 18, tmavé sklo + blur 40 + hluboký stín.
+   Bez rámečku, bez fixní výšky – výška podle obsahu. */
+.sidebar-panel {
+  background-color: var(--sidebar-bg);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border-radius: 18px;
+  border: none;
+  box-shadow: var(--sidebar-shadow);
 }
 
 /* Fade-in pro hotové obrázky po generování (placeholder → hotový snímek) */

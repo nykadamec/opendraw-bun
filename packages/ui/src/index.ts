@@ -1,3 +1,4 @@
+export { default as DesktopSidebar, DESKTOP_NAV_ITEMS } from './components/DesktopSidebar';
 export { default as CanvasArea } from './components/CanvasArea';
 export { default as CanvasComposer } from './components/CanvasComposer';
 export { default as CanvasMasonryGrid } from './components/CanvasMasonryGrid';
