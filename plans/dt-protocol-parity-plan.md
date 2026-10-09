@@ -60,11 +60,36 @@ Když uživatel vybere model, generování má použít **doporučené parametry
 3. Synchronizace se `localStorage` persistencí – doporučení se NEukládají jako „user settings", jen se aplikují při přepnutí modelu.
 
 ### Fáze
-- **B0 kontrakt:** definovat mapování klíčů `configs.json` → `FlatBufferConfigInput` (steps→steps, guidanceScale→cfg, shift→shift, sampler→sampler enum, negative→negativePrompt default, teaCache*/causalInference→respective). Zamrazit.
-- **B1 snapshot:** rozšířit `scripts/ref_models.ts` o stažení `configs.json` → `apps/server/src/model-configs.json` (+ validace, dedup, `--dry-run`/`--verbose` jako u modelů). Pustit, commnit snapshot.
-- **B2 server enrichment:** `model-configs.ts` + integrace v `generate.ts` (priorita + `pristineParams`/`applyRecommended`). Test: Qwen 2.1 → steps 40, cfg 1, shift 1 (ne 28/3.5/1.0).
-- **B3 (volitelné) route + UI prefill:** `/api/model-configs` + Configuration panel „recommended" badge.
-- **B4 validace:** e2e pro 3–4 reprezentativní modely (FLUX.2 dev, Qwen 2.1, Z-Image Turbo, Wan 2.1) – srovnat výsledný config vs. DT doporučení; regression že explicitní user value se nepřepíše.
+- **B0 kontrakt (ZAMRAZEN – ověřeno proti `FlatBufferConfigInput` v `packages/protocol/src/fbs-config.ts:10`):** mapování klíčů `configs.json` → `FlatBufferConfigInput`. Klíče `configs.json` jsou 1:1 se jmény v `FlatBufferConfigInput`, jen 3 vyjímky:
+
+  | `configs.json` | `FlatBufferConfigInput` | pozn. |
+  |---|---|---|
+  | `configuration.steps` | `steps` | |
+  | `configuration.guidanceScale` | `cfg` | **přejmenování** |
+  | `configuration.shift` | `shift` | |
+  | `configuration.resolutionDependentShift` | `resolutionDependentShift` | |
+  | `configuration.sampler` (uint) | `sampler` (string) | **enum → name** přes `resolveSampler` (samplers.ts) |
+  | `configuration.negative` (top-level klíč, NE v `configuration`) | → default `negativePrompt` | **jiná úroveň JSONu** |
+  | `configuration.seedMode` | `seedMode` | |
+  | `configuration.clipSkip` | `clipSkip` | |
+  | `configuration.maskBlur` / `maskBlurOutset` | `maskBlur` / `maskBlurOutset` | |
+  | `configuration.strength` | `strength` | |
+  | `configuration.sharpness` | `sharpness` | |
+  | `configuration.batchCount` / `batchSize` | `batchCount` / `batchSize` | |
+  | `configuration.hiresFix` | `hiresFix` | (bool; width/height/strength jen pokud v configu) |
+  | `configuration.upscalerScaleFactor` | `upscalerScaleFactor` | |
+  | `configuration.tiledDecoding` / `tiledDiffusion` | `tiledDecoding` / `tiledDiffusion` | |
+  | `configuration.teaCache` / `teaCacheStart` / `teaCacheEnd` / `teaCacheThreshold` / `teaCacheMaxSkipSteps` | stejné jméno | |
+  | `configuration.causalInference` (uint) | `causalInference` + `causalInferenceEnabled: value>0` | **2 pole z 1** |
+  | `configuration.model` | – (ignore) | už řešíme z `modelVersion` |
+  | `configuration.loras` / `controls` | – (ignore) | user-level, ne per-model default |
+  | `configuration.preserveOriginalAfterInpaint` | `preserveOriginalAfterInpaint` | |
+
+  **Pravidla:** (1) enrichment přepíše jen pole, která UI posle jako `pristine` (nebo `applyRecommended`); (2) `negative` se používá jen jako *fallback* když je `negativePrompt` prázdný; (3) pole ne přítomné v daném configu = nenáhrádat.
+- **B1 snapshot:** rozšířit `scripts/ref_models.ts` o stažení `configs.json` → `apps/server/src/model-configs.json` (top-level pole, 57 záznamů; dedup podle `version`; `--dry-run`/`--verbose` jako u modelů). Pustit, commnit snapshot.
+- **B2 server enrichment:** `apps/server/src/services/model-configs.ts` (validace + index `file → ModelConfig`) + integrace v `generate.ts` (priorita + `pristineParams`/`applyRecommended`). Test: Qwen 2.1 → steps 40, cfg 1, shift 1 (ne 28/3.5/1.0).
+- **B3 (volitelné) route + UI prefill:** `GET /api/model-configs` + api-client `fetchModelConfigs()` + Configuration panel „recommended" badge + „Použít doporučené" / „Resetovat na moje".
+- **B4 validace:** e2e pro 3–4 reprezentativní modely (FLUX.2 [klein] 9B, Qwen Image 2.1, Z-Image Turbo, Wan 2.1) – srovnat výsledný `FlatBufferConfigInput` vs. DT doporučení; regression že explicitní user value se nepřepíše.
 
 ### Co nedělat (B)
 - Neukládat doporučení do `localStorage` jako trvalé user settings (přepnou se při změně modelu).
@@ -149,12 +174,20 @@ B a E se dají dělat paralelně; F se rozjede až po F0 testu.
 4. **E:** `serverIdentifier` ≠ 0 = „remote/DT+"? Zamrzít po pozorování (E0) – heuristika se potvrdí reálným DT+ tokenem.
 5. **F:** on-demand route (doporučeno) vs. on-start flag? A ověřit semantiku nahrazení v F0.
 
-## 6. Následující úkol (NEVÝCHODÍ z tohoto plánu) – redesign „Configuration panel"
-Po schválení B/E/F: navrhnout v **pencil MCP** redesign right sidebar „Configuration panel"
-(deSKTOP `GenConfigPanel`, dnes: PromptCard + ParamChipBar + akordeóny Model/Sampler/Rozměry/
-Pokročilé/Upscaler/Refiner/Hires Fix/LoRA + Generate button). Navrh jako `.pen` frame + shrnutí
-doporučené struktury pro implementaci. Mobilní `ParamSheet` (bottom-sheet) se redesignu **neúčastní**.
+## 6. Následující úkol (DONE) – redesign „Configuration panel"
+Vypracováno v **pencil MCP** na `/Users/nykadamec/Documents/opendraw.pen`, frame „ConfigPanel Redesign" (ID `EjMwK`):
+- Panel = pinned header (52px) + scrollable body + pinned footer (64px) – žádný překryv Generate a obsahu.
+- Horní polovina: Model card (primární, s „doporučený" badge z úk. B) + Server badge „DT+ Cloud" (úk. E).
+- Prompt s trigger chips (`+ neon`/`+ rain`/`− blurry`) + collapsed „Negativní prompt".
+- Sampling: Sampler dropdown + Steps/CFG slidery (přímo, ne v akordeonu).
+- Rozměry: aspect presets (1:2/1:1/4:5/3:4/16:9, 1:1 default) + `1024×1024`.
+- LoRA inline: chip s weightem + dashed „Přidat LoRA".
+- 7 annotation calloutů vpravo na canvasu vysvětlují rozhodnutí.
+
+Mobilní `ParamSheet` (bottom-sheet) se redesignu neúčastní.
 
 ## Stav
-- Navrženo 2026-10-08, kód nezačínal. Branch `feat/dt-protocol-parity` připravená.
-- Očekává se schválení §5 (otevřené volby) → pak fáze B0/E0/F0.
+- 2026-10-08: navrženo, branch `feat/dt-protocol-parity`, commit `ade297d`.
+- B0 ZAMRAZEN (mapovací tabulka ověřena proti `fbs-config.ts:10`).
+- Pencil redesign Configuration panelu hotov (`opendraw.pen`).
+- Očekává se schválení §5 (otevřené volby) → pak fáze B1/E0/F0.
