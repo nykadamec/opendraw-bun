@@ -181,6 +181,48 @@ function Chip({ label, value, active, onClick }: { label: string; value: string;
     </button>
   );
 }
+
+function EditableLoraWeight({ weight, onCommit }: { weight: number; onCommit: (v: number) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState('');
+  const commit = (raw: string) => {
+    const parsed = parseFloat(raw.replace(',', '.'));
+    setEditing(false);
+    if (!Number.isFinite(parsed)) return;
+    onCommit(Math.min(8, Math.max(-8, parsed)));
+  };
+  if (editing) {
+    return (
+      <input
+        data-el-name="LoraWeightValue"
+        type="text"
+        inputMode="decimal"
+        aria-label="Váha LoRA – ruční zadání"
+        title="Klikni pro ruční zadání váhy"
+        autoFocus
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onFocus={(e) => e.target.select()}
+        onClick={(e) => e.stopPropagation()}
+        onBlur={() => commit(draft)}
+        onKeyDown={(e) => {
+          e.stopPropagation();
+          if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+          else if (e.key === 'Escape') setEditing(false);
+        }}
+        className="w-10 bg-surface border border-txt-secondary rounded px-1 py-0.5 text-xs text-right tabular-nums text-txt-primary outline-none"
+      />
+    );
+  }
+  return (
+    <span
+      data-el-name="LoraWeightValue"
+      title="Klikni pro ruční zadání váhy"
+      onClick={(e) => { e.stopPropagation(); setDraft(String(weight)); setEditing(true); }}
+      className="text-xs text-txt-tertiary w-10 text-right tabular-nums cursor-text hover:text-txt-primary"
+    >{weight.toFixed(2)}</span>
+  );
+}
 export default function CanvasComposer(props: CanvasComposerProps) {
   const {
     floating = false,
@@ -521,19 +563,19 @@ export default function CanvasComposer(props: CanvasComposerProps) {
                             <div data-el-name="LoraWeightControls" className="flex items-center gap-1.5 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                               <button data-el-name="LoraWeightDecrement" type="button" onClick={(e) => {
                                 const step = e.shiftKey ? 0.1 : 0.01;
-                                onLorasChange(loras.map((l) => l.file === lora ? { ...l, weight: Math.max(-2, +(l.weight - step).toFixed(2)) } : l));
+                                onLorasChange(loras.map((l) => l.file === lora ? { ...l, weight: Math.max(-8, +(l.weight - step).toFixed(2)) } : l));
                               }}
                                 className="w-7 h-7 rounded bg-surface text-sm font-medium flex items-center justify-center border border-border active:bg-border"
                               >−</button>
-                              <input data-el-name="LoraWeightSlider" type="range" min={-2} max={2} step={0.01} value={active.weight}
+                              <input data-el-name="LoraWeightSlider" type="range" min={-8} max={8} step={0.01} value={active.weight}
                                 onClick={(e) => e.stopPropagation()}
                                 onChange={(e) => onLorasChange(loras.map((l) => l.file === lora ? { ...l, weight: +e.target.value } : l))}
                                 className="w-16 h-6 accent-txt-primary"
                               />
-                              <span data-el-name="LoraWeightValue" className="text-xs text-txt-tertiary w-10 text-right tabular-nums">{active.weight.toFixed(2)}</span>
+                              <EditableLoraWeight weight={active.weight} onCommit={(v) => onLorasChange(loras.map((l) => l.file === lora ? { ...l, weight: v } : l))} />
                               <button data-el-name="LoraWeightIncrement" type="button" onClick={(e) => {
                                 const step = e.shiftKey ? 0.1 : 0.01;
-                                onLorasChange(loras.map((l) => l.file === lora ? { ...l, weight: Math.min(2, +(l.weight + step).toFixed(2)) } : l));
+                                onLorasChange(loras.map((l) => l.file === lora ? { ...l, weight: Math.min(8, +(l.weight + step).toFixed(2)) } : l));
                               }}
                                 className="w-7 h-7 rounded bg-surface text-sm font-medium flex items-center justify-center border border-border active:bg-border"
                               >+</button>

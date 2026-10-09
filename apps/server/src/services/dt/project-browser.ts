@@ -173,8 +173,33 @@ export function isBusyError(err: unknown): boolean {
   );
 }
 
+/** Rozpozná chybějící tabulku (např. nové/prázdné DT DB bez tensorhistorynode). */
+function isMissingTableError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return /no such table/i.test(msg);
+}
+
+/** Rozpozná odepření přístupu k sandboxovanému DT kontejneru (macOS EPERM). */
+export function isAccessDeniedError(err: unknown): boolean {
+  const code =
+    typeof err === "object" && err !== null && "code" in err
+      ? String((err as { code?: unknown }).code ?? "")
+      : "";
+  if (code === "EPERM" || code === "EACCES") return true;
+  const msg = err instanceof Error ? err.message : String(err);
+  return /EPERM|EACCES|operation not permitted|scandir/i.test(msg);
+}
+
 const BUSY_RETRY_ATTEMPTS = 5;
 const BUSY_RETRY_BASE_DELAY_MS = 100;
+
+/** Stav čitelnosti DT documents dir – pro hlavičku UI místo 500. */
+export interface DocumentsStatus {
+  accessible: boolean;
+  path: string;
+  /** Lidsky čitelný důvod, když accessible=false (jinak null). */
+  reason: string | null;
+}
 
 /** Krátký synchronní spánek mezi retry (funguje i v sync handlerech). */
 function sleepSync(ms: number): void {
@@ -290,6 +315,11 @@ interface ThumbRow {
 export class ProjectBrowser {
   private readonly dtDocsDir: string;
   private readonly db: DbProvider;
+  /** EPERM/EACCES se loguje jen jednou – gallery stránka listProjects polluje. */
+  private docsAccessWarned = false;
+  private lastDocsReason: string | null = null;
+  /** Chybějící tensorhistorynode se hlásí jen jednou (tichý warn, ne error spam). */
+  private missingTableWarned = false;
 
   constructor(dtDocsDir: string, db?: DbProvider);
   /** @deprecated snapshot dir se ignoruje – nechán pro zpětnou kompatibilitu */
@@ -340,12 +370,51 @@ export class ProjectBrowser {
   private readEntryCount(sourcePath: string): number {
     const db = this.db.open(sourcePath, true);
     try {
-      return db.get<CountRow>("SELECT COUNT(*) as c FROM tensorhistorynode")?.c ?? 0;
+      // Některé projektové DB (např. nové "Untitled-*") nemají tabulku
+      // tensorhistorynode – ověř přes sqlite_master (read-only SELECT),
+      // ať COUNT nehází "no such table" při každém listu.
+      try {
+        const exists =
+          db.get<{ n: number }>(
+            "SELECT COUNT(*) as n FROM sqlite_master WHERE type = 'table' AND name = 'tensorhistorynode'",
+          )?.n ?? 0;
+        if (!exists) {
+          this.warnMissingTableOnce();
+          return 0;
+        }
+      } catch (err) {
+        if (isMissingTableError(err)) return 0;
+        throw err;
+      }
+      try {
+        return db.get<CountRow>("SELECT COUNT(*) as c FROM tensorhistorynode")?.c ?? 0;
+      } catch (err) {
+        // TOCTOU / jiná cesta ke stejné příčině – ber jako neznámý/0 bez throw.
+        if (isMissingTableError(err)) return 0;
+        throw err;
+      }
     } finally {
       try {
         db.close();
       } catch {}
     }
+  }
+
+  /** Jednorázový tichý warn pro DB bez tensorhistorynode (žádný error spam). */
+  private warnMissingTableOnce(): void {
+    if (this.missingTableWarned) return;
+    this.missingTableWarned = true;
+    console.warn(
+      "[project-browser] listProjects: some project DBs lack tensorhistorynode table, entryCount=0",
+    );
+  }
+
+  /** Stav pro route hlavičku – UI pozná proč je seznam prázdný (bez 500). */
+  getDocumentsStatus(): DocumentsStatus {
+    if (this.lastDocsReason) {
+      return { accessible: false, path: this.dtDocsDir, reason: this.lastDocsReason };
+    }
+    return { accessible: true, path: this.dtDocsDir, reason: null };
   }
 
   async listProjects(_refresh = false): Promise<ProjectInfo[]> {
@@ -354,10 +423,28 @@ export class ProjectBrowser {
       let names: string[];
       try {
         names = fs.readdirSync(this.dtDocsDir).filter((f) => f.endsWith(".sqlite3"));
+        // Adresář je zase čitelný – povol další warn při příštím výpadku.
+        this.docsAccessWarned = false;
+        this.lastDocsReason = null;
       } catch (err) {
+        const raw = err instanceof Error ? err.message : String(err);
+        if (isAccessDeniedError(err)) {
+          // macOS sandbox: kontejner Draw Things app není čitelný (EPERM).
+          // Graceful: prázdný seznam + jeden warn (žádný log spam, žádná 500).
+          // DT data se nikdy nekopírují ani nezapisují – jen čtení.
+          this.lastDocsReason =
+            "Draw Things documents dir is not accessible from the server sandbox " +
+            `(EPERM: ${this.dtDocsDir}). Grant access or point DT_DOCS_DIR ` +
+            "at a readable copy. Returning empty project list.";
+          if (!this.docsAccessWarned) {
+            this.docsAccessWarned = true;
+            console.warn(`[project-browser] listProjects: ${this.lastDocsReason} Cause: ${raw}`);
+          }
+          return [];
+        }
         console.error(
           "[project-browser] listProjects: cannot read documents dir:",
-          err instanceof Error ? err.message : String(err),
+          raw,
         );
         return [];
       }
@@ -370,8 +457,14 @@ export class ProjectBrowser {
             this.readEntryCount(fullPath),
           );
         } catch (err: unknown) {
-          const msg = err instanceof Error ? err.message : String(err);
-          console.error(`[project-browser] listProjects: count failed for "${id}": ${msg}`);
+          if (isMissingTableError(err)) {
+            // DB bez tensorhistorynode (např. nové "Untitled-*") – count 0,
+            // maximálně jeden tichý warn, žádný per-project error log.
+            this.warnMissingTableOnce();
+          } else {
+            const msg = err instanceof Error ? err.message : String(err);
+            console.error(`[project-browser] listProjects: count failed for "${id}": ${msg}`);
+          }
         }
         try {
           const st = fs.statSync(fullPath);
@@ -412,14 +505,30 @@ export class ProjectBrowser {
       return this.withBusyRetry(safeId, "getProjectEntries", () => {
         const db = this.db.open(sourcePath, true);
         try {
-          const total =
-            db.get<CountRow>("SELECT COUNT(*) as c FROM tensorhistorynode")?.c ?? 0;
-          const offset = (page - 1) * limit;
-          const rows = db.all<TensorRow>(
-            "SELECT rowid, p FROM tensorhistorynode ORDER BY rowid DESC LIMIT ? OFFSET ?",
-            limit,
-            offset,
-          );
+          try {
+            const exists =
+              db.get<{ n: number }>(
+                "SELECT COUNT(*) as n FROM sqlite_master WHERE type = 'table' AND name = 'tensorhistorynode'",
+              )?.n ?? 0;
+            if (!exists) return { entries: [], total: 0 };
+          } catch (err) {
+            if (isMissingTableError(err)) return { entries: [], total: 0 };
+            throw err;
+          }
+          let total: number;
+          let rows: TensorRow[];
+          try {
+            total = db.get<CountRow>("SELECT COUNT(*) as c FROM tensorhistorynode")?.c ?? 0;
+            const offset = (page - 1) * limit;
+            rows = db.all<TensorRow>(
+              "SELECT rowid, p FROM tensorhistorynode ORDER BY rowid DESC LIMIT ? OFFSET ?",
+              limit,
+              offset,
+            );
+          } catch (err) {
+            if (isMissingTableError(err)) return { entries: [], total: 0 };
+            throw err;
+          }
 
           const entries: ProjectEntry[] = rows.map((row) => {
             const buf = toBuffer(row.p) ?? Buffer.alloc(0);
@@ -445,6 +554,10 @@ export class ProjectBrowser {
         }
       });
     } catch (err) {
+      if (isMissingTableError(err)) {
+        this.warnMissingTableOnce();
+        return { entries: [], total: 0 };
+      }
       const msg = err instanceof Error ? err.message : String(err);
       console.error(`[project-browser] getProjectEntries failed for "${safeId}": ${msg}`);
       throw err instanceof Error ? err : new Error(msg);

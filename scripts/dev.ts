@@ -1,4 +1,4 @@
-// F7 – dev orchestrace: server + desktop + mobile v jednom příkazu.
+// F7 – dev orchestrace: server + desktop v jednom příkazu.
 // Použití: bun scripts/dev.ts [--port XXXX] [--public] [--help]
 //   --port XXXX  port API serveru (default 3001)
 //   --public     server host 0.0.0.0 (default localhost)
@@ -19,7 +19,7 @@ function usage(): void {
   console.log("  --public     server host 0.0.0.0 (default localhost)");
   console.log("  --help       tato nápověda");
   console.log("");
-  console.log("Spustí server (3001) + desktop (5173) + mobile (5174).");
+  console.log("Spustí server (3001) + desktop (5173).");
 }
 
 let port = "3001";
@@ -57,7 +57,6 @@ const children: import("node:child_process").ChildProcess[] = [];
 const pidFiles: Record<string, string> = {
   server: "/tmp/opendraw-bun-dev.server.pid",
   desktop: "/tmp/opendraw-bun-dev.desktop.pid",
-  mobile: "/tmp/opendraw-bun-dev.mobile.pid",
 };
 
 function writePid(name: string, pid: number | undefined): void {
@@ -119,7 +118,6 @@ process.on("SIGTERM", () => {
 
 console.log(`[dev] server  http://${displayHost}:${port} (host ${host})`);
 console.log(`[dev] desktop http://${displayHost}:5173  → API ${apiTarget}`);
-console.log(`[dev] mobile  http://${displayHost}:5174  → API ${apiTarget}`);
 console.log("[dev] Ukončení: Ctrl+C");
 console.log("");
 
@@ -129,9 +127,5 @@ run("server", "bun apps/server/src/index.ts", {
 });
 run("desktop", "bun run dev", {
   cwd: path.join(root, "apps", "desktop"),
-  env: { ...process.env, API_TARGET: apiTarget },
-});
-run("mobile", "bun run dev", {
-  cwd: path.join(root, "apps", "mobile"),
   env: { ...process.env, API_TARGET: apiTarget },
 });

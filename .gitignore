@@ -4,3 +4,5 @@ dist/
 data/
 *.local
 .DS_Store
+ssl.cert
+ssl.key

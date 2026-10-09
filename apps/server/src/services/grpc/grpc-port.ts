@@ -1,7 +1,8 @@
 // GrpcPort – hranice mezi serverem a DrawThings gRPC.
-// F1: Echo. F4: generateImageStream (chunkState skládání, progress/preview/
+// F1: Echo. F4: generateImageStream (chunkState skládání, progress/
 // remoteDownload, cancel) + LoRA check/upload. Implementace: ./grpc-client.ts
 // (lazy singleton, TLS z configu). Wire protokol (proto/fbs) se nemění.
+// Preview je vypnuté – previewImage se zahazuje, onPreview se nevolá.
 
 export interface EchoResult {
   message: string;
@@ -49,7 +50,8 @@ export interface GrpcPort {
   /**
    * Generate přes `GenerateImage` (chunked). Vrací jeden Buffer na vygenerovaný
    * tenzor (68B hlavička + payload) – chunky složené podle `chunkState`.
-   * `previewImage` zprávy jdou do `onPreview`, nikdy nejsou finální výstup.
+   * `previewImage` zprávy se zahazují (preview vypnuté, `onPreview` se nevolá),
+   * nikdy nejsou finální výstup.
    * `onCancel` dostane cancel funkci (volat při disconnectu klienta).
    */
   generateImageStream(

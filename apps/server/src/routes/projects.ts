@@ -1,6 +1,9 @@
 // Projects routy – kontrakt 1:1 se starým proxy `index.ts` (F3).
 import { Hono } from "hono";
-import type { ProjectBrowser } from "../services/dt/project-browser.js";
+import {
+  type ProjectBrowser,
+  isAccessDeniedError,
+} from "../services/dt/project-browser.js";
 
 export function projectsRoutes(browser: ProjectBrowser): Hono {
   const app = new Hono();
@@ -9,6 +12,12 @@ export function projectsRoutes(browser: ProjectBrowser): Hono {
     try {
       const refresh = c.req.query("refresh") === "true";
       const projects = await browser.listProjects(refresh);
+      // Při EPERM sandboxu vrací listProjects [] – UI pozná důvod
+      // z hlavičky, kontrakt (pole) se nemění, nikdy 500.
+      const status = browser.getDocumentsStatus();
+      if (!status.accessible && status.reason) {
+        c.header("X-Projects-Warning", status.reason);
+      }
       return c.json(projects);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
@@ -25,6 +34,17 @@ export function projectsRoutes(browser: ProjectBrowser): Hono {
       const result = await browser.getProjectEntries(rawId, page, limit);
       return c.json(result);
     } catch (err: unknown) {
+      if (isAccessDeniedError(err)) {
+        // Sandbox EPERM – projekt není čitelný: 404 s jasnou hláškou, ne 500.
+        return c.json(
+          {
+            error:
+              "Draw Things documents are not accessible from the server sandbox " +
+              "(EPERM). Grant access or point DT_DOCS_DIR at a readable copy.",
+          },
+          404,
+        );
+      }
       const msg = err instanceof Error ? err.message : String(err);
       console.error(`ERROR in /api/projects/${encodeURIComponent(rawId)}/entries:`, msg);
       return c.json({ error: msg }, 500);

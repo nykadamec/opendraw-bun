@@ -5,9 +5,10 @@
 //     steps, cfg, seed, batchCount, width, height, loras, shift, clipSkip,
 //     resolutionDependentShift, saveToGallery, seedMode, upscaler, …,
 //     hiresFix*, tiled*, …),
-//   SSE eventy: `progress` {phase, step, total}, `preview` {data: base64 PNG},
+//   SSE eventy: `progress` {phase, step, total},
 //     `complete` {id, imageBase64, seed, elapsed, index, total},
 //     `error` {message}, `lora-upload` {file, status, error?},
+//   (`preview` event je vypnutý – během samplování se nic neposílá),
 //   `saveToGallery: false` → neukládá do galerie, `complete.id = null`.
 //
 // Průběh: modelVersion (echo override.models → cloud-models fallback) →
@@ -194,6 +195,54 @@ export function generateRoutes(grpc: GrpcPort, config: ServerConfig, gallery: Ga
             }
 
             if (clientDisconnected) return; // abort během echo – nepokračovat
+
+            // LoRA dostupnost PŘED stavbou configu: LoRA se pošle jen když je na DT
+            // serveru, nebo na lokálním disku (ten v tu chvíli nahrajeme). LoRA, která
+            // se na DT nedostane, z configu vynecháme – DT by na ni spadl s INTERNAL.
+            const availableLoras: LoraRef[] = [];
+            const skippedLoras: string[] = [];
+            if ((loras as LoraRef[] | undefined)?.length) {
+              const loraFiles = (loras as LoraRef[]).map((l) => l.file);
+              log("checking LoRA availability (DT + local disk):", loraFiles.join(", "));
+              let existenceMap = new Map<string, boolean>();
+              try {
+                existenceMap = await grpc.checkLorasExist(loraFiles);
+              } catch (checkErr: unknown) {
+                const msg = checkErr instanceof Error ? checkErr.message : String(checkErr);
+                log(`WARNING: FilesExist check failed: ${msg} – treat all as missing`);
+              }
+              for (const lora of loras as LoraRef[]) {
+                if (clientDisconnected) return;
+                if (existenceMap.get(lora.file)) {
+                  log(`LoRA "${lora.file}" already on server`);
+                  availableLoras.push(lora);
+                  continue;
+                }
+                log(`LoRA "${lora.file}" not on server, trying local upload...`);
+                const localPath = config.modelsDir ? await findLoraFile(config.modelsDir, lora.file) : null;
+                if (localPath) {
+                  try {
+                    await grpc.uploadLoraFile(localPath, lora.file);
+                    log(`LoRA "${lora.file}" uploaded successfully`);
+                    sendSSE("lora-upload", { file: lora.file, status: "uploaded" });
+                    availableLoras.push(lora);
+                  } catch (uploadErr: unknown) {
+                    const msg = uploadErr instanceof Error ? uploadErr.message : String(uploadErr);
+                    log(`WARNING: LoRA upload failed for "${lora.file}": ${msg}`);
+                    sendSSE("lora-upload", { file: lora.file, status: "failed", error: msg });
+                    skippedLoras.push(lora.file);
+                  }
+                } else {
+                  log(`WARNING: LoRA "${lora.file}" not found locally, skipping`);
+                  skippedLoras.push(lora.file);
+                }
+              }
+              if (skippedLoras.length) {
+                log(`LoRA skipped (ne na DT ani na disku): ${skippedLoras.join(", ")}`);
+                sendSSE("lora-skipped", { files: skippedLoras });
+              }
+            }
+
             const { buffer: configBuffer, config: resolvedConfig } =
               buildGenerationConfiguration({
                 model,
@@ -205,7 +254,7 @@ export function generateRoutes(grpc: GrpcPort, config: ServerConfig, gallery: Ga
                 batchCount: batchCount || 1,
                 width: width || 1024,
                 height: height || 1024,
-                loras: loras || [],
+                loras: availableLoras,
                 shift: shift ?? 1.0,
                 clipSkip: clipSkip ?? 1,
                 resolutionDependentShift:
@@ -238,45 +287,6 @@ export function generateRoutes(grpc: GrpcPort, config: ServerConfig, gallery: Ga
                 hiresFixStrength,
               });
 
-            if ((loras as LoraRef[] | undefined)?.length) {
-              const loraFiles = (loras as LoraRef[]).map((l) => l.file);
-              log("checking LoRA existence on server:", loraFiles.join(", "));
-
-              try {
-                const existenceMap = await grpc.checkLorasExist(loraFiles);
-
-                for (const lora of loras as LoraRef[]) {
-                  if (clientDisconnected) return;
-                  if (!existenceMap.get(lora.file)) {
-                    log(`LoRA "${lora.file}" not on server, uploading...`);
-                    if (!config.modelsDir) {
-                      log("WARNING: models dir not found, skipping upload");
-                      continue;
-                    }
-                    const localPath = await findLoraFile(config.modelsDir, lora.file);
-                    if (localPath) {
-                      try {
-                        await grpc.uploadLoraFile(localPath, lora.file);
-                        log(`LoRA "${lora.file}" uploaded successfully`);
-                        sendSSE("lora-upload", { file: lora.file, status: "uploaded" });
-                      } catch (uploadErr: unknown) {
-                        const msg = uploadErr instanceof Error ? uploadErr.message : String(uploadErr);
-                        log(`WARNING: LoRA upload failed for "${lora.file}": ${msg}`);
-                        sendSSE("lora-upload", { file: lora.file, status: "failed", error: msg });
-                      }
-                    } else {
-                      log(`WARNING: LoRA "${lora.file}" not found locally, skipping upload`);
-                    }
-                  } else {
-                    log(`LoRA "${lora.file}" already on server`);
-                  }
-                }
-              } catch (checkErr: unknown) {
-                const msg = checkErr instanceof Error ? checkErr.message : String(checkErr);
-                log(`WARNING: FilesExist check failed: ${msg}`);
-              }
-            }
-
             if (clientDisconnected) return; // abort během LoRA fáze – negenerovat
             const grpcRequest = {
               prompt: prompt || "",
@@ -299,11 +309,8 @@ export function generateRoutes(grpc: GrpcPort, config: ServerConfig, gallery: Ga
                   log("signpost:", phase, step ?? "");
                   sendSSE("progress", { phase, step, total });
                 },
-                onPreview: (previewBuf) => {
-                  decodeDtTensorToPng(previewBuf)
-                    .then((pngBuf) => sendSSE("preview", { data: pngBuf.toString("base64") }))
-                    .catch((err) => log("preview decode error:", err));
-                },
+                // Preview vypnuté – buffery ignoruj (nedekódovat, nelogovat, neposílat SSE).
+                onPreview: () => {},
               },
               (cancel) => {
                 grpcCancel = cancel;

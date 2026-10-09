@@ -138,7 +138,7 @@ function sharedSecret(config: ServerConfig): string | undefined {
  * Vrací jeden Buffer na vygenerovaný tenzor (kompletní, 68B hlavička +
  * payload) – chunky se skládají transparentně podle `chunkState` (server ho
  * posílá, když se tenzor nevejde do jedné gRPC zprávy). `previewImage` zprávy
- * se předávají do `onPreview`, nikdy nejsou finální výstup.
+ * se zahazují hned (preview je vypnuté), nikdy nejsou finální výstup.
  */
 function generateImageStream(
   client: any,
@@ -148,7 +148,6 @@ function generateImageStream(
 ): Promise<Buffer[]> {
   const tensors: Buffer[] = [];
   let pending: Buffer | null = null;
-  let previewCount = 0;
 
   const req = request as Record<string, unknown>;
   console.log("[grpc] GenerateImage call started");
@@ -194,13 +193,8 @@ function generateImageStream(
           tensors.push(final);
         }
       }
-      if (response.previewImage) {
-        previewCount++;
-        const previewBuf = Buffer.from(response.previewImage);
-        if (callbacks?.onPreview) {
-          callbacks.onPreview(previewBuf);
-        }
-      }
+      // Preview vypnuté – response.previewImage se ignoruje (žádný převod
+      // na Buffer, žádné volání onPreview).
       if (response.currentSignpost) {
         const signpost = response.currentSignpost;
         let phase: GenerationPhase | null = null;
@@ -260,12 +254,7 @@ function generateImageStream(
         tensors.push(pending);
         pending = null;
       }
-      console.log(
-        "[grpc] stream ended, total tensors:",
-        tensors.length,
-        "previews:",
-        previewCount,
-      );
+      console.log("[grpc] stream ended, total tensors:", tensors.length);
       resolve(tensors);
     });
     call.on("error", (err: any) => {
