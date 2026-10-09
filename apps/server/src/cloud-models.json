@@ -1,5 +1,290 @@
 [
   {
+    "name": "Qwen Image 2.1",
+    "version": "qwen_image_2.1",
+    "file": "qwen_image_2.1_q8p.ckpt"
+  },
+  {
+    "name": "Qwen Image 2.1 (6-bit)",
+    "version": "qwen_image_2.1",
+    "file": "qwen_image_2.1_q6p.ckpt"
+  },
+  {
+    "name": "Qwen Image 2.1 (8-bit S)",
+    "version": "qwen_image_2.1",
+    "file": "qwen_image_2.1_i8x.ckpt"
+  },
+  {
+    "name": "Qwen Image 2.1 (4-bit S)",
+    "version": "qwen_image_2.1",
+    "file": "qwen_image_2.1_i4x.ckpt"
+  },
+  {
+    "name": "MiniMax H3",
+    "version": "minimax_h3",
+    "file": "minimax_h3_fl2va_q8p.ckpt"
+  },
+  {
+    "name": "MiniMax H3 (6-bit)",
+    "version": "minimax_h3",
+    "file": "minimax_h3_fl2va_q6p.ckpt"
+  },
+  {
+    "name": "MiniMax H3 (8-bit S)",
+    "version": "minimax_h3",
+    "file": "minimax_h3_fl2va_i8x.ckpt"
+  },
+  {
+    "name": "MiniMax H3 (4-bit S)",
+    "version": "minimax_h3",
+    "file": "minimax_h3_fl2va_i4x.ckpt"
+  },
+  {
+    "name": "MiniMax H3 [ref2va]",
+    "version": "minimax_h3",
+    "file": "minimax_h3_ref2va_q8p.ckpt"
+  },
+  {
+    "name": "MiniMax H3 [ref2va] (6-bit)",
+    "version": "minimax_h3",
+    "file": "minimax_h3_ref2va_q6p.ckpt"
+  },
+  {
+    "name": "MiniMax H3 [ref2va] (8-bit S)",
+    "version": "minimax_h3",
+    "file": "minimax_h3_ref2va_i8x.ckpt"
+  },
+  {
+    "name": "MiniMax H3 [ref2va] (4-bit S)",
+    "version": "minimax_h3",
+    "file": "minimax_h3_ref2va_i4x.ckpt"
+  },
+  {
+    "name": "Krea 2 Turbo",
+    "version": "krea_2",
+    "file": "krea_2_turbo_q8p.ckpt"
+  },
+  {
+    "name": "Krea 2 Turbo (6-bit)",
+    "version": "krea_2",
+    "file": "krea_2_turbo_q6p.ckpt"
+  },
+  {
+    "name": "Krea 2 Turbo (8-bit S)",
+    "version": "krea_2",
+    "file": "krea_2_turbo_i8x.ckpt"
+  },
+  {
+    "name": "Krea 2 Turbo (6-bit S)",
+    "version": "krea_2",
+    "file": "krea_2_turbo_i6x.ckpt"
+  },
+  {
+    "name": "Krea 2 Turbo (4-bit S)",
+    "version": "krea_2",
+    "file": "krea_2_turbo_i4x.ckpt"
+  },
+  {
+    "name": "Ideogram 4",
+    "version": "ideogram_4",
+    "file": "ideogram_4_q8p.ckpt"
+  },
+  {
+    "name": "Ideogram 4 (6-bit)",
+    "version": "ideogram_4",
+    "file": "ideogram_4_q6p.ckpt"
+  },
+  {
+    "name": "Ideogram 4 (8-bit S)",
+    "version": "ideogram_4",
+    "file": "ideogram_4_i8x.ckpt"
+  },
+  {
+    "name": "Ideogram 4 (6-bit S)",
+    "version": "ideogram_4",
+    "file": "ideogram_4_i6x.ckpt"
+  },
+  {
+    "name": "Ideogram 4 Instant",
+    "version": "ideogram_4",
+    "file": "ideogram_4_instant_q8p.ckpt"
+  },
+  {
+    "name": "Ideogram 4 Instant (6-bit)",
+    "version": "ideogram_4",
+    "file": "ideogram_4_instant_q6p.ckpt"
+  },
+  {
+    "name": "Ideogram 4 Instant (8-bit S)",
+    "version": "ideogram_4",
+    "file": "ideogram_4_instant_i8x.ckpt"
+  },
+  {
+    "name": "Ideogram 4 Instant (6-bit S)",
+    "version": "ideogram_4",
+    "file": "ideogram_4_instant_i6x.ckpt"
+  },
+  {
+    "name": "Ideogram 4 Fast",
+    "version": "ideogram_4",
+    "file": "ideogram_4_fast_q8p.ckpt"
+  },
+  {
+    "name": "Ideogram 4 Fast (6-bit)",
+    "version": "ideogram_4",
+    "file": "ideogram_4_fast_q6p.ckpt"
+  },
+  {
+    "name": "Ideogram 4 Fast (8-bit S)",
+    "version": "ideogram_4",
+    "file": "ideogram_4_fast_i8x.ckpt"
+  },
+  {
+    "name": "Ideogram 4 Fast (6-bit S)",
+    "version": "ideogram_4",
+    "file": "ideogram_4_fast_i6x.ckpt"
+  },
+  {
+    "name": "Krea 2 Raw",
+    "version": "krea_2",
+    "file": "krea_2_raw_q8p.ckpt"
+  },
+  {
+    "name": "Krea 2 Raw (6-bit)",
+    "version": "krea_2",
+    "file": "krea_2_raw_q6p.ckpt"
+  },
+  {
+    "name": "Krea 2 Raw (8-bit S)",
+    "version": "krea_2",
+    "file": "krea_2_raw_i8x.ckpt"
+  },
+  {
+    "name": "Krea 2 Raw (4-bit S)",
+    "version": "krea_2",
+    "file": "krea_2_raw_i4x.ckpt"
+  },
+  {
+    "name": "Anima Aesthetic 1.1",
+    "version": "cosmos2.5_2b",
+    "file": "anima_aesthetic_1.1_f16.ckpt"
+  },
+  {
+    "name": "Anima Aesthetic 1.1 (8-bit)",
+    "version": "cosmos2.5_2b",
+    "file": "anima_aesthetic_1.1_q8p.ckpt"
+  },
+  {
+    "name": "Anima Aesthetic 1.1 (8-bit S)",
+    "version": "cosmos2.5_2b",
+    "file": "anima_aesthetic_1.1_i8x.ckpt"
+  },
+  {
+    "name": "Anima Turbo 1.0",
+    "version": "cosmos2.5_2b",
+    "file": "anima_turbo_1.0_f16.ckpt"
+  },
+  {
+    "name": "Anima Turbo 1.0 (8-bit)",
+    "version": "cosmos2.5_2b",
+    "file": "anima_turbo_1.0_q8p.ckpt"
+  },
+  {
+    "name": "Anima Turbo 1.0 (8-bit S)",
+    "version": "cosmos2.5_2b",
+    "file": "anima_turbo_1.0_i8x.ckpt"
+  },
+  {
+    "name": "Anima Base 1.0",
+    "version": "cosmos2.5_2b",
+    "file": "anima_base_1.0_f16.ckpt"
+  },
+  {
+    "name": "Anima Base 1.0 (8-bit)",
+    "version": "cosmos2.5_2b",
+    "file": "anima_base_1.0_q8p.ckpt"
+  },
+  {
+    "name": "Anima Base 1.0 (8-bit S)",
+    "version": "cosmos2.5_2b",
+    "file": "anima_base_1.0_i8x.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_9b_q8p.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B (6-bit)",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_9b_q6p.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B (8-bit S)",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_9b_i8x.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B KV",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_9b_kv_q8p.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B KV (6-bit)",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_9b_kv_q6p.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B KV (8-bit S)",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_9b_kv_i8x.ckpt"
+  },
+  {
+    "name": "FLUX.2 [dev]",
+    "version": "flux2",
+    "file": "flux_2_dev_q8p.ckpt"
+  },
+  {
+    "name": "FLUX.2 [dev] (6-bit)",
+    "version": "flux2",
+    "file": "flux_2_dev_q6p.ckpt"
+  },
+  {
+    "name": "FLUX.2 [dev] (8-bit S)",
+    "version": "flux2",
+    "file": "flux_2_dev_i8x.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B Base",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_base_9b_q8p.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B Base (6-bit)",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_base_9b_q6p.ckpt"
+  },
+  {
+    "name": "FLUX.2 [klein] 9B Base (8-bit S)",
+    "version": "flux2_9b",
+    "file": "flux_2_klein_base_9b_i8x.ckpt"
+  },
+  {
+    "name": "Qwen Image 2.1 (Exact)",
+    "version": "qwen_image_2.1",
+    "file": "qwen_image_2.1_f16.ckpt"
+  },
+  {
+    "name": "ERNIE Image Turbo 1.0 (Exact)",
+    "version": "ernie_image",
+    "file": "ernie_image_turbo_f16.ckpt"
+  },
+  {
+    "name": "ERNIE Image Base 1.0 (Exact)",
+    "version": "ernie_image",
+    "file": "ernie_image_f16.ckpt"
+  },
+  {
     "name": "LTX-2.3 22B [distilled] (Exact)",
     "version": "ltx2.3",
     "file": "ltx_2.3_22b_distilled_f16.ckpt"
@@ -13,46 +298,6 @@
     "name": "Qwen Image 2512 (BF16, Exact)",
     "version": "qwen_image",
     "file": "qwen_image_2512_bf16.ckpt"
-  },
-  {
-    "name": "FLUX.2 [klein] 9B",
-    "version": "flux2_9b",
-    "file": "flux_2_klein_9b_q8p.ckpt"
-  },
-  {
-    "name": "FLUX.2 [klein] 9B (6-bit)",
-    "version": "flux2_9b",
-    "file": "flux_2_klein_9b_q6p.ckpt"
-  },
-  {
-    "name": "FLUX.2 [klein] 9B KV",
-    "version": "flux2_9b",
-    "file": "flux_2_klein_9b_kv_q8p.ckpt"
-  },
-  {
-    "name": "FLUX.2 [klein] 9B KV (6-bit)",
-    "version": "flux2_9b",
-    "file": "flux_2_klein_9b_kv_q6p.ckpt"
-  },
-  {
-    "name": "FLUX.2 [dev]",
-    "version": "flux2",
-    "file": "flux_2_dev_q8p.ckpt"
-  },
-  {
-    "name": "FLUX.2 [dev] (6-bit)",
-    "version": "flux2",
-    "file": "flux_2_dev_q6p.ckpt"
-  },
-  {
-    "name": "FLUX.2 [klein] 9B Base",
-    "version": "flux2_9b",
-    "file": "flux_2_klein_base_9b_q8p.ckpt"
-  },
-  {
-    "name": "FLUX.2 [klein] 9B Base (6-bit)",
-    "version": "flux2_9b",
-    "file": "flux_2_klein_base_9b_q6p.ckpt"
   },
   {
     "name": "FLUX.2 [klein] 4B (Exact)",
@@ -138,41 +383,6 @@
     "name": "FLUX.1 Krea [dev] (5-bit)",
     "version": "flux1",
     "file": "flux_1_krea_dev_q5p.ckpt"
-  },
-  {
-    "name": "Krea 2 Turbo",
-    "version": "krea_2",
-    "file": "krea_2_turbo_q8p.ckpt"
-  },
-  {
-    "name": "Krea 2 Turbo (6-bit)",
-    "version": "krea_2",
-    "file": "krea_2_turbo_q6p.ckpt"
-  },
-  {
-    "name": "Krea 2 Turbo (8-bit S)",
-    "version": "krea_2",
-    "file": "krea_2_turbo_i8x.ckpt"
-  },
-  {
-    "name": "Krea 2 Turbo (6-bit S)",
-    "version": "krea_2",
-    "file": "krea_2_turbo_i6x.ckpt"
-  },
-  {
-    "name": "Krea 2 Raw",
-    "version": "krea_2",
-    "file": "krea_2_raw_q8p.ckpt"
-  },
-  {
-    "name": "Krea 2 Raw (6-bit)",
-    "version": "krea_2",
-    "file": "krea_2_raw_q6p.ckpt"
-  },
-  {
-    "name": "Krea 2 Raw (8-bit S)",
-    "version": "krea_2",
-    "file": "krea_2_raw_i8x.ckpt"
   },
   {
     "name": "FLUX.1 [dev]",
