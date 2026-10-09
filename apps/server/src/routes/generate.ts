@@ -22,6 +22,7 @@ import type { GrpcPort } from "../services/grpc/grpc-port.js";
 import type { GalleryStore } from "../services/storage/gallery-store.js";
 import { decodeDtTensorToPng } from "../services/dt/dt-tensor.js";
 import { getCloudModels } from "../services/cloud-models.js";
+import { getModelConfig, applyRecommendedConfig } from "../services/model-configs.js";
 import { findLoraFile } from "../services/lora/lora-files.js";
 import { buildGenerationConfiguration } from "@opendraw/protocol/src/fbs-config.js";
 
@@ -164,8 +165,12 @@ export function generateRoutes(grpc: GrpcPort, config: ServerConfig, gallery: Ga
         async function run(): Promise<void> {
           try {
             let modelVersion: string | undefined;
+            let serverIdentifier: string | undefined;
             try {
               const echoResult = await grpc.echo();
+              // E1: log server identifier (diagnostika DT+ cloud vs lokal DT)
+              serverIdentifier = echoResult.serverIdentifier;
+              log(`serverIdentifier: ${serverIdentifier || '(empty)'}`);
               if (echoResult.override?.models) {
                 const models = JSON.parse(
                   Buffer.from(echoResult.override.models, "base64").toString("utf-8"),
@@ -191,6 +196,33 @@ export function generateRoutes(grpc: GrpcPort, config: ServerConfig, gallery: Ga
               );
               if (cloudMatch) {
                 modelVersion = cloudMatch.version;
+              }
+            }
+
+            // B2: apply recommended config (per-model defaults z configs.json)
+            // pro parametry, které UI ještě nedotklo (pristineParams).
+            const applyRecommended = body.applyRecommended !== false; // default true
+            const pristineParams: string[] = Array.isArray(body.pristineParams)
+              ? body.pristineParams
+              : [];
+            if (applyRecommended && model && pristineParams.length) {
+              const recConfig = getModelConfig(model);
+              if (recConfig) {
+                log(`recommended config for ${model}:`, recConfig.name, `(${recConfig.configuration.model})`);
+                // Apply enrichment k tělu requestu (jen pristine pole)
+                const enriched = applyRecommendedConfig(body, recConfig, pristineParams);
+                // Přepiš relevantní pole v body (jen ty, které se změnily)
+                for (const k of pristineParams) {
+                  if (enriched[k] !== undefined && enriched[k] !== body[k]) {
+                    (body as Record<string, any>)[k] = enriched[k];
+                    log(`  enriched ${k}:`, body[k], "← recommended", recConfig.configuration[k === "cfg" ? "guidanceScale" : k]);
+                  }
+                }
+                // negative fallback
+                if (enriched.negativePrompt !== body.negativePrompt) {
+                  (body as Record<string, any>).negativePrompt = enriched.negativePrompt;
+                  log("  enriched negativePrompt (fallback from recommended)");
+                }
               }
             }
 
@@ -302,6 +334,7 @@ export function generateRoutes(grpc: GrpcPort, config: ServerConfig, gallery: Ga
             log("config hex:", configBuffer.toString("hex"));
 
             const total = steps || 28;
+            let responseTags: string[] = [];
             const tensors = await grpc.generateImageStream(
               grpcRequest,
               {
@@ -311,6 +344,11 @@ export function generateRoutes(grpc: GrpcPort, config: ServerConfig, gallery: Ga
                 },
                 // Preview vypnuté – buffery ignoruj (nedekódovat, nelogovat, neposílat SSE).
                 onPreview: () => {},
+                // E2: tags z response (diagnostika, který server odpověděl)
+                onTags: (tags) => {
+                  responseTags = tags;
+                  log("server tags:", tags);
+                },
               },
               (cancel) => {
                 grpcCancel = cancel;
@@ -330,6 +368,16 @@ export function generateRoutes(grpc: GrpcPort, config: ServerConfig, gallery: Ga
             }
 
             const shouldSave = saveToGallery !== false;
+
+            // E2: pošlete meta event (serverIdentifier + tags) před prvním complete
+            // – UI si ho může uložit k výsledku (galerie item metadata).
+            if (serverIdentifier || responseTags.length) {
+              sendSSE("meta", {
+                serverIdentifier: serverIdentifier || null,
+                tags: responseTags.length ? responseTags : null,
+              });
+            }
+
             for (let i = 0; i < tensors.length; i++) {
               if (clientDisconnected) return;
               const id = uuidv4();

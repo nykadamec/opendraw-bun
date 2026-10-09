@@ -20,6 +20,7 @@ const ECHO_DEADLINE_SEC = 5;
 const GENERATE_DEADLINE_SEC = 120;
 const FILES_EXIST_DEADLINE_SEC = 10;
 const UPLOAD_DEADLINE_SEC = 300;
+const UPDATE_MODEL_LIST_DEADLINE_SEC = 30;
 const UPLOAD_CHUNK_SIZE = 4 * 1024 * 1024;
 
 function resolveProtoPath(): string {
@@ -37,19 +38,37 @@ function resolveProtoPath(): string {
   throw new Error(`imageService.proto not found (tried: ${candidates.join(", ")})`);
 }
 
+function resolveControlPanelProtoPath(): string {
+  const candidates: string[] = [];
+  candidates.push(path.resolve(import.meta.dir, "../../../../../packages/protocol/proto/controlPanel.proto"));
+  candidates.push(path.resolve(process.cwd(), "packages/protocol/proto/controlPanel.proto"));
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+  throw new Error(`controlPanel.proto not found (tried: ${candidates.join(", ")})`);
+}
+
 function isIpLiteral(host: string): boolean {
   return /^\d{1,3}(\.\d{1,3}){3}$/.test(host) || host.includes(":");
 }
 
-function buildClient(config: ServerConfig): any {
-  const packageDefinition = protoLoader.loadSync(resolveProtoPath(), {
+function buildClient(config: ServerConfig): { imageService: any; controlPanel: any } {
+  const imageServiceDef = protoLoader.loadSync(resolveProtoPath(), {
     keepCase: true,
     longs: String,
     enums: String,
     defaults: true,
     oneofs: true,
   });
-  const proto = grpc.loadPackageDefinition(packageDefinition) as any;
+  const controlPanelDef = protoLoader.loadSync(resolveControlPanelProtoPath(), {
+    keepCase: true,
+    longs: String,
+    enums: String,
+    defaults: true,
+    oneofs: true,
+  });
+  const proto = grpc.loadPackageDefinition(imageServiceDef) as any;
+  const protoCp = grpc.loadPackageDefinition(controlPanelDef) as any;
   const address = `${config.dtHost}:${config.dtPort}`;
 
   const channelOptions: grpc.ChannelOptions = {
@@ -61,33 +80,39 @@ function buildClient(config: ServerConfig): any {
     channelOptions["grpc.primary_user_agent"] = `secret=${config.dtApiKey}`;
   }
 
-  // Node TLS odmítá IP v SNI servername – DT cert je vydaný na hostname,
-  // takže pro IP hosta zachováme ověření proti "localhost" (stejné jako
-  // staré proxy s default hostem localhost).
   if (isIpLiteral(config.dtHost)) {
     channelOptions["grpc.ssl_target_name_override"] = "localhost";
   }
 
   const rootCa = loadSslCert(config.sslCertPath);
-  return new proto.ImageGenerationService(
-    address,
-    grpc.credentials.createSsl(Buffer.from(rootCa)),
-    channelOptions,
-  );
+  const creds = grpc.credentials.createSsl(Buffer.from(rootCa));
+  return {
+    imageService: new proto.ImageGenerationService(address, creds, channelOptions),
+    controlPanel: protoCp.ControlPanelService
+      ? new protoCp.ControlPanelService(address, creds, channelOptions)
+      : null,
+  };
 }
 
 export function createGrpcPort(config: ServerConfig): GrpcPort {
-  let client: any = null;
-  const getClient = (): any => {
+  let client: { imageService: any; controlPanel: any } | null = null;
+  const getIs = (): any => {
     if (!client) client = buildClient(config);
-    return client;
+    return client.imageService;
+  };
+  const getCp = (): any => {
+    if (!client) client = buildClient(config);
+    if (!client.controlPanel) {
+      throw new Error("ControlPanelService not available (controlPanel.proto not loaded)");
+    }
+    return client.controlPanel;
   };
   return {
     echo(): Promise<EchoResult> {
       return new Promise((resolve, reject) => {
         const deadline = new Date();
         deadline.setSeconds(deadline.getSeconds() + ECHO_DEADLINE_SEC);
-        getClient().Echo({ name: "opendraw" }, { deadline }, (err: any, response: any) => {
+        getIs().Echo({ name: "opendraw" }, { deadline }, (err: any, response: any) => {
           if (err) reject(err);
           else resolve(response as EchoResult);
         });
@@ -96,7 +121,8 @@ export function createGrpcPort(config: ServerConfig): GrpcPort {
     reset(): void {
       if (client) {
         try {
-          client.close();
+          client.imageService.close();
+          if (client.controlPanel) client.controlPanel.close();
         } catch {
           // ignoruj – klient se zahazuje tak jako tak
         }
@@ -108,13 +134,32 @@ export function createGrpcPort(config: ServerConfig): GrpcPort {
       callbacks?: StreamCallbacks,
       onCancel?: (cancel: () => void) => void,
     ): Promise<Buffer[]> {
-      return generateImageStream(getClient(), request, callbacks, onCancel);
+      return generateImageStream(getIs(), request, callbacks, onCancel);
     },
     checkLorasExist(files: string[]): Promise<Map<string, boolean>> {
-      return checkLorasExist(getClient(), config, files);
+      return checkLorasExist(getIs(), config, files);
     },
     uploadLoraFile(filePath: string, fileName: string): Promise<boolean> {
-      return uploadLoraFile(getClient(), config, filePath, fileName);
+      return uploadLoraFile(getIs(), config, filePath, fileName);
+    },
+    updateModelList(files: string[], message?: string): Promise<string> {
+      return new Promise((resolve, reject) => {
+        const deadline = new Date();
+        deadline.setSeconds(deadline.getSeconds() + UPDATE_MODEL_LIST_DEADLINE_SEC);
+        const request: any = { files };
+        if (message) request.message = message;
+        const secret = config.dtApiKey?.trim();
+        if (secret) request.sharedSecret = secret;
+        getCp().UpdateModelList(request, { deadline }, (err: any, response: any) => {
+          if (err) {
+            console.log("[update-model-list] error:", err.message);
+            reject(err);
+            return;
+          }
+          console.log("[update-model-list] response:", response.message);
+          resolve(response.message as string);
+        });
+      });
     },
   };
 }
@@ -241,6 +286,10 @@ function generateImageStream(
       }
       if (response.generatedAudio && response.generatedAudio.length) {
         console.log("[grpc] received audio data, parts:", response.generatedAudio.length);
+      }
+      // E2: tags z ImageGenerationResponse (diagnostika, který server odpověděl)
+      if (response.tags && response.tags.length && callbacks?.onTags) {
+        callbacks.onTags(response.tags as string[]);
       }
     });
 

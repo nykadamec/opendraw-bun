@@ -10,6 +10,7 @@ import { createCanvasStore } from "./services/storage/canvas-store.js";
 import { createProjectBrowser } from "./services/dt/project-browser.js";
 import { authRoutes } from "./routes/auth.js";
 import { cloudModelsRoutes } from "./routes/cloud-models.js";
+import { modelConfigRoutes } from "./routes/model-configs.js";
 import { echoRoutes } from "./routes/echo.js";
 import { galleryRoutes } from "./routes/gallery.js";
 import { generateRoutes } from "./routes/generate.js";
@@ -30,7 +31,8 @@ const app = new Hono();
 
 app.get("/api/health", (c) => c.json({ ok: true }));
 app.route("/", echoRoutes(grpc, config));
-app.route("/", cloudModelsRoutes());
+app.route("/", cloudModelsRoutes(grpc));
+app.route("/", modelConfigRoutes());
 app.route("/", authRoutes());
 app.route("/", galleryRoutes(gallery));
 app.route("/", generateRoutes(grpc, config, gallery));
