@@ -37,16 +37,34 @@ const CLOUD_MODELS_PATH = resolve(
   "src",
   "cloud-models.json",
 );
+const MODEL_CONFIGS_PATH = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  "..",
+  "apps",
+  "server",
+  "src",
+  "model-configs.json",
+);
 
 const DRAWTHINGS_API_BASE = "https://api.drawthings.ai";
 // Oficiální Draw Things katalog (public, žádný token) – zdroj seznamu cloud modelů.
 // Viz DrawOtherThings CLI: fetchCommunitySpecifications() → models.drawthings.ai/models.json.
 const DEFAULT_MODELS_URL = "https://models.drawthings.ai/models.json";
 
+// Zdroj doporučených konfigurací (B1): stejný public katalog jako models.json.
+const DEFAULT_CONFIGS_URL = "https://models.drawthings.ai/configs.json";
+
 interface CloudModel {
   name: string;
   version: string;
   file: string;
+}
+
+interface ModelConfigEntry {
+  name: string;
+  version: string;
+  negative: string;
+  configuration: Record<string, unknown>;
 }
 
 interface CloudModelsDoc {
@@ -60,11 +78,15 @@ function parseArgs(argv: string[]): {
   dryRun: boolean;
   verbose: boolean;
   source: string | null;
+  withConfigs: boolean;
+  configsSource: string | null;
 } {
-  const opts: { dryRun: boolean; verbose: boolean; source: string | null } = {
+  const opts: { dryRun: boolean; verbose: boolean; source: string | null; withConfigs: boolean; configsSource: string | null } = {
     dryRun: false,
     verbose: false,
     source: null,
+    withConfigs: true, // default: obnovení configů společně s modely
+    configsSource: null,
   };
   for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
@@ -75,8 +97,14 @@ function parseArgs(argv: string[]): {
       if (!next) throw new Error("--source vyžaduje cestu ke zdrojovému souboru");
       opts.source = next;
     } else if (arg.startsWith("--source=")) opts.source = arg.slice("--source=".length);
+    else if (arg === "--no-configs") opts.withConfigs = false;
+    else if (arg === "--configs-source" || arg === "-c") {
+      const next = argv[++i];
+      if (!next) throw new Error("--configs-source vyžaduje cestu ke zdrojovému souboru");
+      opts.configsSource = next;
+    } else if (arg.startsWith("--configs-source=")) opts.configsSource = arg.slice("--configs-source=".length);
     else if (arg === "--help" || arg === "-h") {
-      console.log("Použití: bun scripts/ref_models.ts [--dry-run] [--verbose] [--source PATH]");
+      console.log("Použití: bun scripts/ref_models.ts [--dry-run] [--verbose] [--source PATH] [--no-configs] [--configs-source PATH]");
       process.exit(0);
     } else {
       throw new Error(`Neznámý argument: ${arg} (použij --help)`);
@@ -108,6 +136,46 @@ function isCloudModel(m: unknown): m is CloudModel {
     typeof r.version === "string" && r.version.length > 0 &&
     typeof r.file === "string" && r.file.length > 0
   );
+}
+
+function isModelConfig(c: unknown): c is ModelConfigEntry {
+  if (!c || typeof c !== "object" || Array.isArray(c)) return false;
+  const r = c as Record<string, unknown>;
+  if (!(typeof r.name === "string" && r.name.length > 0)) return false;
+  if (!(typeof r.configuration === "object" && r.configuration !== null && !Array.isArray(r.configuration))) return false;
+  // Spolehlivý klíč je configuration.model (filename), version bývá často neplatný.
+  const cfg = r.configuration as Record<string, unknown>;
+  return typeof cfg.model === "string" && cfg.model.length > 0;
+}
+
+// Normalizace configs.json: dedup podle `configuration.model` (filename) –
+// spolehlivý klíč, `version` bývá neplatný. Zachová pořadí (první výskyt).
+// `negative` není povinný (může chybět) – doplníme prázdný string.
+function normalizeConfigs(raw: unknown, source: string): { configs: ModelConfigEntry[]; dropped: number } {
+  const list: unknown[] = Array.isArray(raw)
+    ? raw
+    : raw && typeof raw === "object" && Array.isArray((raw as { configs?: unknown }).configs)
+      ? (raw as { configs: unknown[] }).configs
+      : [];
+  if (list.length === 0) {
+    throw new Error(
+      `Zdroj ${source}: nenalezeno pole configů (očekáváno JSON pole, nebo objekt s polem "configs")`,
+    );
+  }
+  const valid = list.filter(isModelConfig);
+  const seen = new Map<string, ModelConfigEntry>();
+  for (const c of valid) {
+    const key = (c.configuration as Record<string, unknown>).model as string;
+    if (!seen.has(key)) {
+      seen.set(key, {
+        name: c.name,
+        version: typeof c.version === "string" && c.version.length > 0 ? c.version : "",
+        negative: typeof c.negative === "string" ? c.negative : "",
+        configuration: c.configuration,
+      });
+    }
+  }
+  return { configs: [...seen.values()], dropped: list.length - valid.length };
 }
 
 // Normalizace libovolného vstupu do konzistentního tvaru CloudModel[],
@@ -197,6 +265,33 @@ async function fetchFromDrawThings(verbose: boolean): Promise<{ raw: unknown; la
     console.log(`[verbose] UKAZKA odpovedi ${modelsUrl}: ${sample.slice(0, 500)}${sample.length > 500 ? "…" : ""}`);
   }
   return { raw: normalizeDrawThings(data), label: modelsUrl };
+}
+
+// ---------- Configs (B1) ----------
+
+async function fetchConfigs(
+  verbose: boolean,
+  configsSource: string | null,
+): Promise<{ raw: unknown; label: string }> {
+  const url = (process.env.DT_CONFIGS_URL ?? DEFAULT_CONFIGS_URL).trim();
+  if (configsSource) return fetchFromLocalFile(configsSource);
+
+  // Public katalog, žádný token (stejné jako models.json).
+  const res = await fetch(url);
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(
+      res.status === 404
+        ? `Configs endpoint ${url} vrací 404 – zkontroluj URL (DT_CONFIGS_URL) nebo použij --configs-source PATH.`
+        : `Configs request failed (HTTP ${res.status}): ${text}`,
+    );
+  }
+  const data = (await res.json()) as unknown;
+  if (verbose) {
+    const sample = JSON.stringify(data);
+    console.log(`[verbose] UKAZKA odpovedi ${url}: ${sample.slice(0, 500)}${sample.length > 500 ? "…" : ""}`);
+  }
+  return { raw: data, label: url };
 }
 
 // ---------- Čtení / zápis cílového souboru ----------
@@ -294,6 +389,57 @@ async function main(): Promise<void> {
   console.log(`  Načteno modelů:      ${models.length} (zdroj: ${label})`);
   console.log(`  Aktualizováno modelů: ${models.length} (+${added.length} / -${removed.length})`);
   console.log(`  Soubor:              ${CLOUD_MODELS_PATH}${opts.dryRun ? " (dry-run, neuloženo)" : ""}`);
+
+  // ---------- Configs (B1) ----------
+  if (opts.withConfigs) {
+    try {
+      const cfgRes = await fetchConfigs(opts.verbose, opts.configsSource);
+      const { configs, dropped: cfgDropped } = normalizeConfigs(cfgRes.raw, cfgRes.label);
+      if (opts.verbose) {
+        console.log(`[verbose] Načteno ${configs.length} configů z ${cfgRes.label}${cfgDropped > 0 ? ` (${cfgDropped} vynechán(a))` : ""}`);
+        for (const c of configs) {
+          const cfg = c.configuration;
+          console.log(`[verbose]   - ${c.name} (${c.version}) steps=${cfg.steps} cfg=${cfg.guidanceScale} shift=${cfg.shift} sampler=${cfg.sampler}`);
+        }
+      }
+
+      // Diff proti aktuálnímu souboru
+      let currentConfigs: ModelConfigEntry[] = [];
+      if (existsSync(MODEL_CONFIGS_PATH)) {
+        try {
+          const raw = JSON.parse(readFileSync(MODEL_CONFIGS_PATH, "utf8"));
+          const list: unknown[] = Array.isArray(raw) ? raw : (raw as { configs?: unknown[] }).configs ?? [];
+          currentConfigs = list.filter(isModelConfig);
+        } catch {
+          currentConfigs = [];
+        }
+      }
+      const cfgKey = (c: ModelConfigEntry): string => (c.configuration as Record<string, unknown>).model as string;
+      const nextKeys = new Set(configs.map(cfgKey));
+      const beforeKeys = new Set(currentConfigs.map(cfgKey));
+      const cfgAdded = configs.filter((c) => !beforeKeys.has(cfgKey(c)));
+      const cfgRemoved = currentConfigs.filter((c) => !nextKeys.has(cfgKey(c)));
+
+      if (opts.dryRun) {
+        console.log(`[dry-run] ${MODEL_CONFIGS_PATH} by se aktualizoval(a) ze zdroje: ${cfgRes.label}`);
+        console.log(`[dry-run]   aktuálně: ${currentConfigs.length} configů → po aktualizaci: ${configs.length}`);
+        console.log(`[dry-run]   přidáno: ${cfgAdded.length}, odebráno: ${cfgRemoved.length}`);
+        if (opts.verbose) {
+          for (const c of cfgAdded) console.log(`[dry-run]   + ${c.name} (${c.version})`);
+          for (const c of cfgRemoved) console.log(`[dry-run]   - ${c.name} (${c.version})`);
+        }
+        console.log("[dry-run] Configs se neukládají.");
+      } else {
+        writeFileSync(MODEL_CONFIGS_PATH, JSON.stringify(configs, null, 2) + "\n", "utf8");
+        log("[verbose] Zapsáno", configs.length, "configů do", MODEL_CONFIGS_PATH);
+      }
+      console.log(`  Načteno configů:     ${configs.length} (zdroj: ${cfgRes.label})`);
+      console.log(`  Aktualizováno configů: ${configs.length} (+${cfgAdded.length} / -${cfgRemoved.length})`);
+      console.log(`  Soubor:              ${MODEL_CONFIGS_PATH}${opts.dryRun ? " (dry-run, neuloženo)" : ""}`);
+    } catch (cfgErr) {
+      console.warn(`Varování: configs refresh selhal – ${(cfgErr as Error).message}. Pokračuji bez nich.`);
+    }
+  }
 }
 
 try {

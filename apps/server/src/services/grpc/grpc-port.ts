@@ -42,6 +42,8 @@ export interface StreamCallbacks {
     item: number,
     itemsExpected: number,
   ) => void;
+  /** E2: tags z ImageGenerationResponse (diagnostika, který server odpověděl). */
+  onTags?: (tags: string[]) => void;
 }
 
 export interface GrpcPort {
@@ -63,6 +65,8 @@ export interface GrpcPort {
   checkLorasExist(files: string[]): Promise<Map<string, boolean>>;
   /** Upload jedné LoRA (init + 4MB chunky, sha256). */
   uploadLoraFile(filePath: string, fileName: string): Promise<boolean>;
+  /** F1: UpdateModelList – push kuraovaných modelů do lokálního DT serveru. */
+  updateModelList(files: string[], message?: string): Promise<string>;
   /** Zahodí lazy klienta (změna configu, testy). */
   reset(): void;
 }

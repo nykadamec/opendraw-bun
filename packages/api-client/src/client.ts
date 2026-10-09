@@ -37,6 +37,27 @@ export async function fetchCloudModels(): Promise<CloudModelsResponse> {
   return request('/cloud-models');
 }
 
+export interface ModelConfigResponse {
+  total: number;
+  withRecommended: number;
+  models: CloudModel[];
+}
+
+export async function fetchModelConfigs(): Promise<ModelConfigResponse> {
+  return request('/model-configs');
+}
+
+export interface ModelConfigDetail {
+  name: string;
+  version: string;
+  negative: string;
+  configuration: Record<string, unknown>;
+}
+
+export async function fetchModelConfig(model: string): Promise<ModelConfigDetail> {
+  return request(`/model-configs/${encodeURIComponent(model)}`);
+}
+
 export function generateImage(
   req: GenerateRequest,
   callbacks: {
